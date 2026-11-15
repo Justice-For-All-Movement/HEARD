@@ -68,3 +68,7 @@ The public-only Next.js shell lives in `apps/web`. See [workspace setup and veri
 ## Privacy architecture handoff
 
 [Threat model and data map](docs/THREAT_MODEL.md) and [versioned privacy design](security/privacy-design.json) enumerate intended boundaries, recipients, potential plaintext exposure and negative-test destinations. `npm run check:privacy-design` validates this design register only; it does not certify runtime security or complete the E2EESA inventory.
+
+## Database baseline
+
+[Schema and migration notes](docs/SCHEMA_MIGRATION_NOTES.md) document the checksum-bound runner, default-deny roles, fictional fixtures and separate native/WASM database test commands. Native and provider acceptance remain explicit; passing foundation checks do not establish database security or deployment readiness.

@@ -25,7 +25,10 @@
     "check:history": "node scripts/check-history-secrets.mjs",
     "check:dependencies": "npm audit --audit-level=high",
     "test:integration": "node --test tests/integration/*.test.mjs",
-    "build:artifact": "node scripts/build-web-artifact.mjs"
+    "build:artifact": "node scripts/build-web-artifact.mjs",
+    "test:database": "node --test tests/database/*.test.mjs",
+    "test:database:wasm": "HEARD_DATABASE_ENGINE=pglite node --test tests/database/migrations.test.mjs",
+    "db:migrate": "node scripts/migrate.mjs"
   },
   "engines": {
     "node": ">=22"
@@ -35,6 +38,7 @@
     "@electric-sql/pglite": "0.5.14",
     "@secretlint/secretlint-rule-preset-recommend": "13.1.0",
     "secretlint": "13.1.0",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "embedded-postgres": "17.11.0-beta.19"
   }
 }
