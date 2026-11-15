@@ -45,3 +45,20 @@ services:
         sync: false
       - key: HEARD_DATA_ENCRYPTION_KEY
         sync: false
+
+# Background worker (HEARD-13 scanning, draft/upload expiry). Enable together with
+# private storage and a scanner; it needs the same DATABASE_URL and storage settings.
+# A Render background worker is a paid service type: the deploying lead decides.
+#
+#  - type: worker
+#    name: heard-worker
+#    runtime: node
+#    plan: starter
+#    buildCommand: npm ci --ignore-scripts
+#    startCommand: npm run worker
+#    envVars:
+#      - key: NODE_VERSION
+#        value: 22.23.4
+#      - key: HEARD_ENV
+#        value: production
+#      - fromGroup: heard-shared   # or repeat DATABASE_URL / HEARD_S3_* / HEARD_CLAMD_* as sync:false
