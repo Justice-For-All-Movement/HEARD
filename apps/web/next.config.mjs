@@ -34,6 +34,7 @@ const config = {
     '@heard/uploads',
     '@heard/quarantine',
     '@heard/evidence',
+    '@heard/jobs',
   ],
   experimental: { cpus: 2 },
   async headers() {

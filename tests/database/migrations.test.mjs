@@ -33,7 +33,9 @@ test('migrations and security invariants on the explicitly selected PostgreSQL e
       try {
         assert.equal((await client.query('SELECT count(*)::int AS count FROM heard_cases')).rows[0].count, 0);
         await assert.rejects(client.query("INSERT INTO heard_subjects(account_state) VALUES('active')"), { code: '42501' });
-        await assert.rejects(client.query('SELECT * FROM heard_jobs'), { code: '42501' });
+        // HEARD-15 gives the API role an RLS-gated read of jobs on the subject's own cases: none without a subject.
+        assert.equal((await client.query('SELECT count(*)::int AS count FROM heard_jobs')).rows[0].count, 0);
+        await assert.rejects(client.query('SELECT * FROM heard_publications'), { code: '42501' });
       } finally { await client.query('RESET ROLE'); }
       await client.query('SET ROLE heard_job_worker');
       // The scan worker holds an RLS-gated SELECT (HEARD-13); without a declared scan purpose and a queued job it sees nothing.
