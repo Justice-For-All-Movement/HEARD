@@ -35,7 +35,16 @@ DECLARE reviewed text[] := ARRAY[
   'heard_resource_grants.heard_grants_create',
   'heard_resource_grants.heard_grants_revoke',
   'heard_consent_records.heard_consent_owner_read',
-  'heard_consent_records.heard_consent_owner_record'
+  'heard_consent_records.heard_consent_owner_record',
+  'heard_intake_drafts.heard_drafts_owner_read',
+  'heard_intake_drafts.heard_drafts_owner_create',
+  'heard_intake_drafts.heard_drafts_owner_update',
+  'heard_intake_drafts.heard_drafts_owner_delete',
+  'heard_intake_drafts.heard_drafts_expiry_purge',
+  'heard_submission_receipts.heard_receipts_owner_read',
+  'heard_submission_receipts.heard_receipts_owner_create',
+  'heard_cases.heard_cases_expiry_withdraw',
+  'heard_cases.heard_cases_expiry_read'
 ];
 DECLARE scoped name[] := ARRAY['heard_api','heard_job_worker','heard_public_projector','heard_operator']::name[];
 BEGIN
@@ -49,7 +58,7 @@ BEGIN
    IF coalesce(p.qual, '') ~* '^\s*\(?\s*true\s*\)?\s*$' OR coalesce(p.with_check, '') ~* '^\s*\(?\s*true\s*\)?\s*$' THEN
      RAISE EXCEPTION 'Unconditional policy %.%', p.tablename, p.policyname;
    END IF;
-   IF coalesce(p.qual, '') !~ '(heard_current_subject|heard_setting|heard_assigned)' AND coalesce(p.with_check, '') !~ '(heard_current_subject|heard_setting|heard_assigned)' THEN
+   IF coalesce(p.qual, '') !~ '(heard_current_subject|heard_setting|heard_assigned|heard_draft_expired)' AND coalesce(p.with_check, '') !~ '(heard_current_subject|heard_setting|heard_assigned|heard_draft_expired)' THEN
      RAISE EXCEPTION 'Policy %.% is not bound to a subject or presented secret', p.tablename, p.policyname;
    END IF;
  END LOOP;

@@ -236,3 +236,122 @@ footer {
     gap: 0.5rem 1.2rem;
   }
 }
+.wizard {
+  margin: 2rem 0;
+  padding: 2rem;
+  background: white;
+  border: 1px solid var(--line);
+}
+.wizard h2:focus,
+.error-summary:focus {
+  outline: 3px solid var(--accent);
+  outline-offset: 4px;
+}
+.wizard label,
+.wizard legend {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+.wizard .check label {
+  display: inline;
+  font-weight: 400;
+  margin-left: 0.5rem;
+}
+.wizard .check {
+  margin: 0.5rem 0;
+  min-height: 2.75rem;
+  display: flex;
+  align-items: center;
+}
+.wizard input[type="text"],
+.wizard input:not([type]),
+.wizard textarea {
+  width: 100%;
+  padding: 0.7rem;
+  font: inherit;
+  border: 2px solid var(--ink);
+  background: white;
+}
+.wizard input[type="checkbox"],
+.wizard input[type="radio"] {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+.wizard input:focus-visible,
+.wizard textarea:focus-visible,
+.wizard button:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+.wizard [aria-invalid="true"] {
+  border-color: #a4161a;
+}
+.field {
+  margin: 1.5rem 0;
+  border: 0;
+  padding: 0;
+}
+.hint {
+  color: #3d524e;
+  margin: 0.2rem 0 0.5rem;
+}
+.field-error,
+.error-summary {
+  color: #8a1014;
+  font-weight: 700;
+}
+.error-summary {
+  border: 3px solid #8a1014;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+.steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  padding-left: 1.25rem;
+  font-size: 0.85rem;
+}
+.steps [aria-current="step"] {
+  font-weight: 700;
+  text-decoration: underline;
+}
+.wizard button {
+  font: inherit;
+  min-height: 2.75rem;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+}
+.wizard .button {
+  border: 0;
+}
+.secondary-button {
+  background: transparent;
+  border: 2px solid var(--ink);
+  color: var(--ink);
+}
+.recovery-code code {
+  font-size: 1.4rem;
+  letter-spacing: 0.08em;
+  word-break: break-all;
+}
+.consent {
+  border: 1px solid var(--line);
+  padding: 1rem;
+  margin: 1.5rem 0;
+}
+.review div {
+  margin-bottom: 0.75rem;
+}
+.review dt {
+  font-weight: 700;
+}
+.review dd {
+  margin: 0;
+  white-space: pre-wrap;
+}
+.note {
+  background: #e7e9df;
+  padding: 0.75rem 1rem;
+}
