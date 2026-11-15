@@ -16,7 +16,7 @@ export interface Facts {
 }
 export interface Decision { readonly allow: boolean; readonly reason: string; }
 export declare function decide(principal: Principal | null, action: string, resource: Resource | null, facts?: Facts): Decision;
-export declare class AuthorizationError extends Error { readonly code: 'NOT_FOUND'; readonly reason: string; }
+export declare class AuthorizationError extends Error { readonly code: 'NOT_FOUND' | 'STATE_FORBIDS_ACTION'; readonly reason: string; }
 export declare function withSession<T>(pool: pg.Pool, session: Session, fn: (client: pg.PoolClient) => Promise<T>): Promise<T>;
 export declare function loadPrincipal(client: QueryClient, session: Session, now?: Date): Promise<Required<Principal>>;
 export declare function authorizeCase(client: QueryClient, session: Session, action: Action, caseId: string, options?: { now?: Date }): Promise<{ id: string; ownerId: string; status: string; kind: string }>;

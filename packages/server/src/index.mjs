@@ -10,6 +10,7 @@ import { adapterReadinessCheck, selectAdapter } from '@heard/secure-intake';
 import { HttpError, errorResponse, json } from './http.mjs';
 import { identityModule } from './identity-routes.mjs';
 import { consentModule } from './consent-routes.mjs';
+import { draftsModule } from './drafts-routes.mjs';
 
 export { HttpError, errorResponse, json } from './http.mjs';
 
@@ -109,5 +110,6 @@ export function createHeardServer(options = {}) {
   app.use({ routes: [], readinessChecks: () => [adapterReadinessCheck(adapter, { required: app.config.intake.enabled })] });
   app.use(identityModule(app.context));
   app.use(consentModule(app.context));
+  app.use(draftsModule(app.context));
   return app;
 }

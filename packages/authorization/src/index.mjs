@@ -97,7 +97,12 @@ export function decide(principal, action, resource, facts = {}) {
 }
 
 export class AuthorizationError extends Error {
-  constructor(reason, auditRecord = null) { super('NOT_FOUND'); this.code = 'NOT_FOUND'; this.reason = reason; this.auditRecord = auditRecord; }
+  constructor(reason, auditRecord = null) {
+    // A state conflict only arises for principals who can already see the resource,
+    // so it may be reported as such; every other denial is indistinguishable from absence.
+    const code = reason === 'state_forbids_action' ? 'STATE_FORBIDS_ACTION' : 'NOT_FOUND';
+    super(code); this.code = code; this.reason = reason; this.auditRecord = auditRecord;
+  }
 }
 
 /**

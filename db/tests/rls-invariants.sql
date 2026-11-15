@@ -9,7 +9,8 @@ BEGIN
  FOREACH table_name IN ARRAY ARRAY[
    'heard_subjects', 'heard_cases', 'heard_case_events',
    'heard_consent_records', 'heard_private_objects', 'heard_publications', 'heard_resource_grants', 'heard_audit_events', 'heard_jobs',
-   'heard_profiles', 'heard_sessions', 'heard_recovery_credentials', 'heard_staff_memberships', 'heard_case_assignments'
+   'heard_profiles', 'heard_sessions', 'heard_recovery_credentials', 'heard_staff_memberships', 'heard_case_assignments',
+   'heard_intake_drafts', 'heard_submission_receipts'
  ] LOOP
    SELECT c.relrowsecurity, c.relforcerowsecurity,
      EXISTS (SELECT 1 FROM aclexplode(COALESCE(c.relacl, acldefault('r',c.relowner))) a WHERE a.grantee = 0)

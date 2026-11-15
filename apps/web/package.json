@@ -10,6 +10,8 @@
     "check:types": "tsc --noEmit"
   },
   "dependencies": {
+    "@heard/consent": "0.0.1",
+    "@heard/intake": "0.0.1",
     "@heard/server": "0.0.1",
     "next": "16.4.3",
     "react": "19.3.1",

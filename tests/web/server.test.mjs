@@ -79,6 +79,11 @@ test('production server: public pages, operations endpoints and fail-closed star
       assert.equal(detail.status, 404, 'detail requires an operator token');
     });
 
+    await t.test('the wizard page does not exist while the feature flag is off', async () => {
+      assert.equal((await server.fetch('/share/start')).status, 404);
+      assert.doesNotMatch(pages.get('/share'), /share\/start/);
+    });
+
     await t.test('intake API is not reachable while the feature flag is off', async () => {
       const response = await server.fetch('/api/v1/anonymous/start', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' });
       assert.equal(response.status, 404);
@@ -99,4 +104,39 @@ test('start script refuses unsafe configuration before listening', async () => {
   assert.equal(badDatabase.code, 78);
   assert.match(badDatabase.output, /sslmode=require/);
   assert.doesNotMatch(badDatabase.output, /do-not-print/);
+});
+
+test('with the intake flag on, the share page links to an accessible private wizard', async () => {
+  const key = n => Buffer.alloc(32, n).toString('base64');
+  const server = await startWebServer({
+    HEARD_INTAKE_ENABLED: 'true',
+    DATABASE_URL: 'postgres://unused@127.0.0.1:1/unused',
+    HEARD_SESSION_SECRET: key(1),
+    HEARD_DATA_ENCRYPTION_KEY: key(2),
+  });
+  try {
+    const share = await (await server.fetch('/share')).text();
+    assert.match(share, /href="\/share\/start"/);
+    assert.match(share, /use only fictional information/);
+    const response = await server.fetch('/share/start');
+    assert.equal(response.status, 200);
+    const html = await response.text();
+    assert.equal([...html.matchAll(/<h1\b/g)].length, 1);
+    assert.match(html, /<h2[^>]*tabindex="-1"[^>]*>How this works<\/h2>/);
+    assert.match(html, /You do not need an email address or phone number/);
+    assert.match(html, /Hosting and network providers can still see connection details/);
+    assert.match(html, /HEARD is not an emergency service/);
+    assert.match(html, /<button[^>]*type="button"[^>]*>Begin privately<\/button>/);
+    assert.match(html, /Resume with a recovery code/);
+    assert.doesNotMatch(html, /(?<!not )end-to-end encrypt|guaranteed anonym/i);
+    for (const match of html.matchAll(/<input\b[^>]*>/g)) {
+      const id = /id="([^"]+)"/.exec(match[0])?.[1];
+      assert.ok(id && html.includes(`for="${id}"`), `unlabelled input ${match[0]}`);
+    }
+    assert.equal(response.headers.get('cache-control')?.includes('no-store') || response.headers.get('cache-control')?.includes('private') || response.headers.get('cache-control')?.includes('no-cache'), true);
+    const schema = await server.fetch('/api/v1/intake/schema');
+    assert.equal(schema.status, 200);
+  } finally {
+    await server.stop();
+  }
 });

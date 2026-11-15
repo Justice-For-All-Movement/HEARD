@@ -22,6 +22,7 @@ export const routes = {
   },
 } as const;
 
-export function isPublicPath(path: string): path is keyof typeof routes {
+export type PublicPath = keyof typeof routes;
+export function isPublicPath(path: string): path is PublicPath {
   return Object.hasOwn(routes, path);
 }
