@@ -18,7 +18,22 @@ DECLARE reviewed text[] := ARRAY[
   'heard_recovery_credentials.heard_recovery_update',
   'heard_staff_memberships.heard_staff_self',
   'heard_staff_memberships.heard_staff_operator',
-  'heard_audit_events.heard_audit_append_self'
+  'heard_audit_events.heard_audit_append_self',
+  'heard_case_assignments.heard_assignments_self',
+  'heard_case_assignments.heard_assignments_operator',
+  'heard_cases.heard_cases_operator',
+  'heard_cases.heard_cases_owner_read',
+  'heard_cases.heard_cases_owner_create',
+  'heard_cases.heard_cases_owner_update',
+  'heard_cases.heard_cases_assigned_read',
+  'heard_cases.heard_cases_assigned_review',
+  'heard_case_events.heard_case_events_visible',
+  'heard_case_events.heard_case_events_append',
+  'heard_private_objects.heard_objects_visible',
+  'heard_private_objects.heard_objects_owner_insert',
+  'heard_resource_grants.heard_grants_visible',
+  'heard_resource_grants.heard_grants_create',
+  'heard_resource_grants.heard_grants_revoke'
 ];
 DECLARE scoped name[] := ARRAY['heard_api','heard_job_worker','heard_public_projector','heard_operator']::name[];
 BEGIN
@@ -32,7 +47,7 @@ BEGIN
    IF coalesce(p.qual, '') ~* '^\s*\(?\s*true\s*\)?\s*$' OR coalesce(p.with_check, '') ~* '^\s*\(?\s*true\s*\)?\s*$' THEN
      RAISE EXCEPTION 'Unconditional policy %.%', p.tablename, p.policyname;
    END IF;
-   IF coalesce(p.qual, '') !~ '(heard_current_subject|heard_setting)' AND coalesce(p.with_check, '') !~ '(heard_current_subject|heard_setting)' THEN
+   IF coalesce(p.qual, '') !~ '(heard_current_subject|heard_setting|heard_assigned)' AND coalesce(p.with_check, '') !~ '(heard_current_subject|heard_setting|heard_assigned)' THEN
      RAISE EXCEPTION 'Policy %.% is not bound to a subject or presented secret', p.tablename, p.policyname;
    END IF;
  END LOOP;
