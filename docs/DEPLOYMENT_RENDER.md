@@ -41,6 +41,10 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 
 Back up `HEARD_DATA_ENCRYPTION_KEY` in the organization's secret store: losing it makes encrypted drafts unrecoverable. Rotating it requires a new `HEARD_DATA_ENCRYPTION_KEY_ID` and a re-encryption job (not yet implemented).
 
+## Background worker (uploads)
+
+Uploads (HEARD-12/13) need private storage (`HEARD_OBJECT_STORAGE_DRIVER=s3` + `HEARD_S3_*`) and a separate worker process running `npm run worker` with the same `DATABASE_URL`, storage and scanner settings (`HEARD_SCANNER_DRIVER=clamd`, `HEARD_CLAMD_HOST`). A commented Render background-worker definition is at the end of `render.yaml`. Without a scanner, uploads stay quarantined and are never served. ClamAV itself (e.g. a private Render service running clamd) is not defined here.
+
 ## Environment variables
 
 Required-ness is enforced by `packages/config`. Secrets are marked; never commit their values.

@@ -50,7 +50,11 @@ DECLARE reviewed text[] := ARRAY[
   'heard_upload_sessions.heard_uploads_owner_update',
   'heard_upload_sessions.heard_uploads_expiry_read',
   'heard_upload_sessions.heard_uploads_expiry_update',
-  'heard_upload_parts.heard_upload_parts_owner'
+  'heard_upload_parts.heard_upload_parts_owner',
+  'heard_jobs.heard_jobs_enqueue_scan',
+  'heard_jobs.heard_jobs_scan_worker',
+  'heard_private_objects.heard_objects_scan_read',
+  'heard_private_objects.heard_objects_scan_update'
 ];
 DECLARE scoped name[] := ARRAY['heard_api','heard_job_worker','heard_public_projector','heard_operator']::name[];
 BEGIN
@@ -64,12 +68,12 @@ BEGIN
    IF coalesce(p.qual, '') ~* '^\s*\(?\s*true\s*\)?\s*$' OR coalesce(p.with_check, '') ~* '^\s*\(?\s*true\s*\)?\s*$' THEN
      RAISE EXCEPTION 'Unconditional policy %.%', p.tablename, p.policyname;
    END IF;
-   IF coalesce(p.qual, '') !~ '(heard_current_subject|heard_setting|heard_assigned|heard_draft_expired)' AND coalesce(p.with_check, '') !~ '(heard_current_subject|heard_setting|heard_assigned|heard_draft_expired)' THEN
+   IF coalesce(p.qual, '') !~ '(heard_current_subject|heard_setting|heard_assigned|heard_draft_expired|heard_scan_target)' AND coalesce(p.with_check, '') !~ '(heard_current_subject|heard_setting|heard_assigned|heard_draft_expired|heard_scan_target)' THEN
      RAISE EXCEPTION 'Policy %.% is not bound to a subject or presented secret', p.tablename, p.policyname;
    END IF;
  END LOOP;
- -- Tables that must stay default-deny (no policy at all) until their owning unit reviews access.
- IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname = current_schema() AND tablename IN ('heard_jobs','heard_publications')) THEN
-   RAISE EXCEPTION 'Jobs and publications must remain default-deny';
+ -- Publications stay default-deny (no policy at all) until the projector unit (HEARD-23) reviews access.
+ IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname = current_schema() AND tablename IN ('heard_publications')) THEN
+   RAISE EXCEPTION 'Publications must remain default-deny';
  END IF;
 END $$;

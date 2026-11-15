@@ -12,6 +12,8 @@ import { identityModule } from './identity-routes.mjs';
 import { consentModule } from './consent-routes.mjs';
 import { draftsModule } from './drafts-routes.mjs';
 import { uploadsModule } from './upload-routes.mjs';
+import { objectsModule } from './object-routes.mjs';
+import { enqueueScan } from '@heard/quarantine';
 import { selectStorage } from '@heard/storage';
 
 export { HttpError, errorResponse, json } from './http.mjs';
@@ -114,6 +116,9 @@ export function createHeardServer(options = {}) {
   app.use(consentModule(app.context));
   app.use(draftsModule(app.context));
   app.context.storage = options.storage !== undefined ? options.storage : selectStorage(app.config.objectStorage);
+  // Every completed upload is queued for scanning in the same transaction (HEARD-13).
+  app.context.onObjectQuarantined = enqueueScan;
   app.use(uploadsModule(app.context));
+  app.use(objectsModule(app.context));
   return app;
 }

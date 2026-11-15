@@ -32,6 +32,7 @@ const config = {
     '@heard/drafts',
     '@heard/storage',
     '@heard/uploads',
+    '@heard/quarantine',
   ],
   experimental: { cpus: 2 },
   async headers() {
