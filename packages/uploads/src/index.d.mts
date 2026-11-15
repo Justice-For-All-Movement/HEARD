@@ -17,5 +17,5 @@ export interface UploadService {
   complete(session: Session, uploadId: string, options?: { now?: Date }): Promise<{ objectId: string; state: 'quarantined'; sha256: string; size: number }>;
   abort(session: Session, uploadId: string, options?: { now?: Date }): Promise<{ uploadId: string; state: 'aborted' }>;
 }
-export declare function createUploadService(deps: { pool: pg.Pool; storage: ObjectStorage | null; onObjectQuarantined?: (client: QueryClient, input: { objectId: string; caseId: string }) => Promise<void> }): UploadService;
+export declare function createUploadService(deps: { pool: pg.Pool; storage: ObjectStorage | null; onObjectQuarantined?: (client: QueryClient, input: { objectId: string; caseId: string; actorId: string }) => Promise<void> }): UploadService;
 export declare function expireUploadSessions(pool: pg.Pool, storage: ObjectStorage): Promise<number>;

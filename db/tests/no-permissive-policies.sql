@@ -54,7 +54,11 @@ DECLARE reviewed text[] := ARRAY[
   'heard_jobs.heard_jobs_enqueue_scan',
   'heard_jobs.heard_jobs_scan_worker',
   'heard_private_objects.heard_objects_scan_read',
-  'heard_private_objects.heard_objects_scan_update'
+  'heard_private_objects.heard_objects_scan_update',
+  'heard_private_objects.heard_objects_ledger_advance',
+  'heard_evidence_events.heard_evidence_events_read',
+  'heard_evidence_events.heard_evidence_events_append',
+  'heard_evidence_events.heard_evidence_events_service'
 ];
 DECLARE scoped name[] := ARRAY['heard_api','heard_job_worker','heard_public_projector','heard_operator']::name[];
 BEGIN

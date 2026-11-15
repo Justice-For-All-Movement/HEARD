@@ -1,0 +1,13 @@
+# Evidence integrity, provenance and chain of handling (HEARD-14)
+
+Implemented in migration `0011_evidence_ledger.sql`, `packages/evidence` and hooks in uploads, the scan worker and downloads.
+
+- **Immutable originals.** A trigger rejects any change to an object's ID, case, storage key, SHA-256, size, declared type, upload session, creator or creation time, and rejects deletion (deletion belongs to the retention process, HEARD-41). Only scan status columns and the ledger head may change.
+- **Hash-chained, append-only ledger** (`heard_evidence_events`). The database assigns each event's ordinal, previous hash, timestamp and SHA-256 (`heard-ledger-v1` canonical form) under a row lock on the object, and stores the head on the object. Writers cannot choose hashes, predecessors, order or their own actor kind: the trigger derives `contributor` / `staff` (assigned MFA) / `helper`; `service` events are written only by the scan worker. Updates and deletes are rejected.
+- **Events:** `received` (upload complete), `scan_cleared` / `scan_rejected` (worker, with engine/reason), `downloaded` (every release of bytes), `verified` / `verification_failed` (re-read digest check), `source_asserted` (contributor statement).
+- **Detail** is limited to allowlisted short values (`reason`, `engine`, `source`, `captured` as YYYY[-MM[-DD]]), so narratives, names and contact data never enter hashes, manifests or indexes.
+- **Verification** recomputes every event hash, link and ordinal and compares the last hash with the stored head; privileged tampering (editing or deleting events with triggers disabled) is reported as `altered_event_N`, `gap_at_N`, `broken_link_at_N` or `head_mismatch`. `POST /api/v1/objects/{id}/verify` re-reads the stored bytes and records the result.
+- **Source statements** (`POST /api/v1/objects/{id}/source`): owner-only, from a fixed vocabulary (`self_recorded`, `recorded_by_someone_else`, `official_record`, `public_source`, `unknown`) plus an optional capture date; always presented as the contributor's own statement.
+- **Private export manifest** (`GET /api/v1/my/cases/{id}/evidence-manifest`, owner or assigned MFA staff): digests, sizes, types, states, source statements and the verified ledger, with the notice that it does not establish authenticity. No storage keys, narratives or actor identities.
+
+Limits: the chain detects tampering after the fact; it does not prevent a database superuser from rewriting the whole chain consistently. Periodic external anchoring of ledger heads (without publishing case-identifying hashes) is future work (DEVELOPMENT_PLAN §4.4). Derivative linkage is added with media processing (HEARD-16).

@@ -1,9 +1,10 @@
 /** HEARD-13 HTTP routes: list a case's objects and download cleared objects only. */
 import { authorizeCase, authorizeObject, withSession } from '@heard/authorization';
+import { actorKind, assertSource, caseManifest, recordEvent, verifyObjectBytes } from '@heard/evidence';
 import { isUuid } from '@heard/database';
 import { mapped } from './errors.mjs';
-import { HttpError, json } from './http.mjs';
-import { requireIntake } from './request.mjs';
+import { HttpError, json, readJson } from './http.mjs';
+import { requireIntake, requireSameOrigin } from './request.mjs';
 
 const EXTENSIONS = { 'image/jpeg': 'jpg', 'image/png': 'png', 'application/pdf': 'pdf', 'video/mp4': 'mp4', 'video/quicktime': 'mov', 'audio/mpeg': 'mp3', 'audio/mp4': 'm4a' };
 
@@ -35,7 +36,10 @@ export function objectsModule(context) {
           const objectId = id(match[1]);
           const object = await withSession(context.getPool(), session, async client => {
             await authorizeObject(client, session, 'evidence.read', objectId);
-            return (await client.query('SELECT storage_ref, quarantine_state, detected_type, size_bytes FROM heard_private_objects WHERE id=$1', [objectId])).rows[0];
+            const row = (await client.query('SELECT o.case_id, o.storage_ref, o.quarantine_state, o.detected_type, o.size_bytes, c.subject_id FROM heard_private_objects o LEFT JOIN heard_cases c ON c.id = o.case_id WHERE o.id=$1', [objectId])).rows[0];
+            // Every release of bytes is attributable in the chain of handling (HEARD-14).
+            if (row?.quarantine_state === 'cleared') await recordEvent(client, { objectId, caseId: row.case_id, operation: 'downloaded', actorKind: actorKind(session, row.subject_id), actorId: session.subjectId });
+            return row;
           });
           // Unscanned, failed or rejected bytes are never served, even to their owner.
           if (!object || object.quarantine_state !== 'cleared' || !EXTENSIONS[object.detected_type]) throw new HttpError('NOT_EDITABLE');
@@ -62,6 +66,37 @@ export function objectsModule(context) {
               'referrer-policy': 'no-referrer',
             },
           });
+        }),
+      },
+      {
+        method: 'POST', pattern: /^\/api\/v1\/objects\/([^/]+)\/verify$/, label: '/api/v1/objects/:id/verify',
+        handler: mapped(async (request, match) => {
+          available();
+          requireSameOrigin(request, config);
+          const session = await context.requireSession(request);
+          const objectId = id(match[1]);
+          return json(200, await withSession(context.getPool(), session, client => verifyObjectBytes(client, session, context.storage, objectId)));
+        }),
+      },
+      {
+        method: 'POST', pattern: /^\/api\/v1\/objects\/([^/]+)\/source$/, label: '/api/v1/objects/:id/source',
+        handler: mapped(async (request, match) => {
+          available();
+          requireSameOrigin(request, config);
+          const session = await context.requireSession(request);
+          const objectId = id(match[1]);
+          const body = await readJson(request);
+          if (Object.keys(body).some(k => !['source', 'captured'].includes(k))) throw new HttpError('INVALID_REQUEST');
+          return json(201, await withSession(context.getPool(), session, client => assertSource(client, session, objectId, { source: body.source, captured: body.captured })));
+        }),
+      },
+      {
+        method: 'GET', pattern: /^\/api\/v1\/my\/cases\/([^/]+)\/evidence-manifest$/, label: '/api/v1/my/cases/:id/evidence-manifest',
+        handler: mapped(async (request, match) => {
+          available();
+          const session = await context.requireSession(request);
+          const caseId = id(match[1]);
+          return json(200, await withSession(context.getPool(), session, client => caseManifest(client, session, caseId)));
         }),
       },
     ],

@@ -138,10 +138,10 @@ export function createUploadService({ pool, storage, onObjectQuarantined = async
       }
       return withSession(pool, session, async client => {
         const object = (await client.query(
-          "INSERT INTO heard_private_objects(case_id, storage_ref, checksum_sha256, quarantine_state, declared_type, size_bytes, upload_session_id) VALUES($1,$2,$3,'quarantined',$4,$5,$6) RETURNING id",
-          [s.caseId, s.storageKey, s.expectedSha256, s.declaredType, s.declaredSize, uploadId])).rows[0];
+          "INSERT INTO heard_private_objects(case_id, storage_ref, checksum_sha256, quarantine_state, declared_type, size_bytes, upload_session_id, created_by) VALUES($1,$2,$3,'quarantined',$4,$5,$6,$7) RETURNING id",
+          [s.caseId, s.storageKey, s.expectedSha256, s.declaredType, s.declaredSize, uploadId, session.subjectId])).rows[0];
         await client.query("UPDATE heard_upload_sessions SET state='completed', object_id=$2, completed_at=$3 WHERE id=$1 AND state='completing'", [uploadId, object.id, now]);
-        await onObjectQuarantined(client, { objectId: object.id, caseId: s.caseId });
+        await onObjectQuarantined(client, { objectId: object.id, caseId: s.caseId, actorId: session.subjectId });
         await audit(client, session.subjectId, 'upload.completed', 'allow', { caseId: s.caseId, metadata: { reason: 'quarantined' } });
         return { objectId: object.id, state: 'quarantined', sha256: s.expectedSha256, size: s.declaredSize };
       });
