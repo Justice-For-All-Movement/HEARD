@@ -8,7 +8,7 @@
   ],
   "schemaVersion": 1,
   "roadmapVersion": 1,
-  "observedAt": "2026-11-15T19:15:45Z",
+  "observedAt": "2026-11-15T19:23:11Z",
   "units": [
     {
       "id": "HEARD-01",
@@ -224,7 +224,9 @@
       "id": "HEARD-14",
       "title": "Evidence integrity, provenance and handling ledger",
       "origin": "original",
-      "prs": [],
+      "prs": [
+        33
+      ],
       "dependsOn": [
         "HEARD-12",
         "HEARD-13"
@@ -1059,6 +1061,30 @@
       "updatedAt": "2026-11-15T19:15:44Z",
       "mergedAt": "2026-11-15T19:15:44Z",
       "closedAt": "2026-11-15T19:15:44Z",
+      "draft": false
+    },
+    {
+      "id": 5326204453,
+      "number": 32,
+      "title": "Registry and status: map HEARD-01..13 to merged PRs; fix repository identity",
+      "state": "closed",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/32",
+      "createdAt": "2026-11-15T19:15:55Z",
+      "updatedAt": "2026-11-15T19:21:24Z",
+      "mergedAt": "2026-11-15T19:21:24Z",
+      "closedAt": "2026-11-15T19:21:24Z",
+      "draft": false
+    },
+    {
+      "id": 5326260210,
+      "number": 33,
+      "title": "HEARD-14: Evidence integrity, provenance and chain-of-handling ledger",
+      "state": "closed",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/33",
+      "createdAt": "2026-11-15T19:21:42Z",
+      "updatedAt": "2026-11-15T19:23:09Z",
+      "mergedAt": "2026-11-15T19:23:09Z",
+      "closedAt": "2026-11-15T19:23:09Z",
       "draft": false
     }
   ]
