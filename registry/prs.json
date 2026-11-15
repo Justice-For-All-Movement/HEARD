@@ -8,7 +8,7 @@
   ],
   "schemaVersion": 1,
   "roadmapVersion": 1,
-  "observedAt": "2026-11-15T19:14:43Z",
+  "observedAt": "2026-11-15T19:15:45Z",
   "units": [
     {
       "id": "HEARD-01",
@@ -1053,12 +1053,12 @@
       "id": 5326189887,
       "number": 31,
       "title": "HEARD-13: Malware quarantine, parser safety and cleared-only delivery",
-      "state": "open",
+      "state": "closed",
       "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/31",
       "createdAt": "2026-11-15T19:14:25Z",
-      "updatedAt": "2026-11-15T19:14:25Z",
-      "mergedAt": null,
-      "closedAt": null,
+      "updatedAt": "2026-11-15T19:15:44Z",
+      "mergedAt": "2026-11-15T19:15:44Z",
+      "closedAt": "2026-11-15T19:15:44Z",
       "draft": false
     }
   ]
