@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "kind": "HEARD_SECURE_INTAKE_ADAPTER_BOUNDARY",
+  "adapterContractVersion": "1.0.0",
+  "status": "LOCAL_ADAPTER_IMPLEMENTED_REMOTE_UNVERIFIED",
+  "adapters": {
+    "local": {
+      "implementation": "packages/secure-intake/src/index.mjs#createLocalAdapter",
+      "storage": "HEARD-owned PostgreSQL (heard_cases, heard_case_events) inside RLS-scoped transactions",
+      "capabilities": ["case.create_draft", "case.submit", "case.withdraw", "case.read_status", "case.record_event", "case.transition_review"]
+    },
+    "remote": {
+      "implementation": "packages/secure-intake/src/index.mjs#createRemoteAdapter",
+      "verifiedUpstreamVersions": [],
+      "capabilities": [],
+      "blocker": "Upstream Secure Intake & Case Workflow Engine API, version, token audience and event-signing contract have not been verified against a real deployment."
+    }
+  },
+  "unsupportedCapabilities": ["case.assign_reviewer", "case.helper_grant"],
+  "invariants": [
+    "Never expose raw evidence in public API or index",
+    "Case events carry only allowlisted non-narrative metadata",
+    "State transitions are compare-and-set; replays and concurrent transitions fail with ADAPTER_STATE_CONFLICT",
+    "Missing and unauthorized cases are indistinguishable (ADAPTER_NOT_FOUND)",
+    "Credentials and service endpoints are configured server-side only",
+    "No public publication, partner export or replication by default",
+    "Remote mode never silently falls back to the local adapter"
+  ],
+  "liveConnectionVerified": false
+}

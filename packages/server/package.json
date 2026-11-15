@@ -3,11 +3,19 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
-  "exports": {".": {"types": "./src/index.d.mts", "default": "./src/index.mjs"}},
-  "engines": {"node": ">=22"},
+  "exports": {
+    ".": {
+      "types": "./src/index.d.mts",
+      "default": "./src/index.mjs"
+    }
+  },
+  "engines": {
+    "node": ">=22"
+  },
   "dependencies": {
     "@heard/config": "0.0.1",
     "@heard/database": "0.0.1",
-    "@heard/operations": "0.0.1"
+    "@heard/operations": "0.0.1",
+    "@heard/secure-intake": "0.0.1"
   }
 }
