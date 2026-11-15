@@ -10,7 +10,7 @@ export function mapDomainError(error) {
   if (code === 'CONSENT_POLICY_STALE' || code === 'DRAFT_REVISION_CONFLICT') return new HttpError('CONFLICT', error.field ? { fields: { [error.field]: code } } : {});
   if (code === 'CONSENT_REQUIRED') return new HttpError('CONSENT_REQUIRED', error.field ? { fields: { purpose: error.field } } : {});
   if (code === 'ADAPTER_STATE_CONFLICT' || code === 'ADAPTER_INVALID_TRANSITION' || code === 'DRAFT_NOT_EDITABLE') return new HttpError('NOT_EDITABLE');
-  if (typeof code === 'string' && /^(CONSENT|INTAKE|DRAFT|ADAPTER_INVALID|UPLOAD)_/.test(code)) return new HttpError('INVALID_REQUEST', error.field ? { fields: { [error.field]: code } } : {});
+  if (typeof code === 'string' && /^(CONSENT|INTAKE|DRAFT|ADAPTER_INVALID|UPLOAD|EVIDENCE)_/.test(code)) return new HttpError('INVALID_REQUEST', error.field ? { fields: { [error.field]: code } } : {});
   return error;
 }
 

@@ -18,6 +18,7 @@
     "@heard/consent": "0.0.1",
     "@heard/database": "0.0.1",
     "@heard/drafts": "0.0.1",
+    "@heard/evidence": "0.0.1",
     "@heard/identity": "0.0.1",
     "@heard/intake": "0.0.1",
     "@heard/operations": "0.0.1",

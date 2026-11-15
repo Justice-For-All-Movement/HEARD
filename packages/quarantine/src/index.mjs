@@ -204,6 +204,10 @@ export async function processScanJobs(pool, { storage, scanner, workerId = rando
           `UPDATE heard_jobs SET state=$2, lease_owner=NULL, lease_until=NULL, last_error_code=$3, available_at=now() + ($4::int * interval '1 millisecond'), finished_at=CASE WHEN $2='failed' THEN now() END WHERE id=$1`,
           [job.id, exhausted ? 'failed' : 'queued', outcome.code, RETRY_BACKOFF_MS[Math.min(job.attempts - 1, RETRY_BACKOFF_MS.length - 1)]]);
       } else {
+        // Chain-of-handling entry first, while the object is still quarantined (HEARD-14).
+        const detail = outcome.state === 'cleared' ? { engine: outcome.engine } : { reason: outcome.reason, ...(outcome.engine ? { engine: outcome.engine } : {}) };
+        await client.query("INSERT INTO heard_evidence_events(object_id, case_id, operation, actor_kind, actor_id, detail) SELECT id, case_id, $2, 'service', NULL, $3 FROM heard_private_objects WHERE id=$1",
+          [job.object_id, outcome.state === 'cleared' ? 'scan_cleared' : 'scan_rejected', detail]);
         await client.query(
           "UPDATE heard_private_objects SET quarantine_state=$2, quarantine_reason=$3, scan_verdict=$4, scan_engine=$5, scanned_at=now(), detected_type=$6 WHERE id=$1 AND quarantine_state='quarantined'",
           [job.object_id, outcome.state, outcome.reason, outcome.verdict ?? null, outcome.engine ?? null, outcome.detectedType ?? null]);
