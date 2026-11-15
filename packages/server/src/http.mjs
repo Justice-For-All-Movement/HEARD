@@ -77,3 +77,23 @@ export function parseCookies(header) {
   }
   return out;
 }
+
+/** Read a bounded binary body (application/octet-stream). */
+export async function readBytes(request, { maxBytes }) {
+  const type = (request.headers.get('content-type') ?? '').trim().toLowerCase();
+  if (type !== 'application/octet-stream') throw new HttpError('UNSUPPORTED_MEDIA_TYPE');
+  const declared = Number(request.headers.get('content-length') ?? '0');
+  if (declared > maxBytes) throw new HttpError('PAYLOAD_TOO_LARGE');
+  const reader = request.body?.getReader();
+  if (!reader) return Buffer.alloc(0);
+  const chunks = [];
+  let size = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.length;
+    if (size > maxBytes) { await reader.cancel().catch(() => {}); throw new HttpError('PAYLOAD_TOO_LARGE'); }
+    chunks.push(value);
+  }
+  return Buffer.concat(chunks);
+}

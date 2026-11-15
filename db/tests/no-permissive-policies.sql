@@ -44,7 +44,13 @@ DECLARE reviewed text[] := ARRAY[
   'heard_submission_receipts.heard_receipts_owner_read',
   'heard_submission_receipts.heard_receipts_owner_create',
   'heard_cases.heard_cases_expiry_withdraw',
-  'heard_cases.heard_cases_expiry_read'
+  'heard_cases.heard_cases_expiry_read',
+  'heard_upload_sessions.heard_uploads_owner_read',
+  'heard_upload_sessions.heard_uploads_owner_create',
+  'heard_upload_sessions.heard_uploads_owner_update',
+  'heard_upload_sessions.heard_uploads_expiry_read',
+  'heard_upload_sessions.heard_uploads_expiry_update',
+  'heard_upload_parts.heard_upload_parts_owner'
 ];
 DECLARE scoped name[] := ARRAY['heard_api','heard_job_worker','heard_public_projector','heard_operator']::name[];
 BEGIN
