@@ -13,7 +13,9 @@
     "node": ">=22"
   },
   "dependencies": {
+    "@heard/authorization": "0.0.1",
     "@heard/config": "0.0.1",
+    "@heard/consent": "0.0.1",
     "@heard/database": "0.0.1",
     "@heard/identity": "0.0.1",
     "@heard/operations": "0.0.1",
