@@ -15,7 +15,7 @@
     "check:packages": "node scripts/check-package-contract.mjs",
     "test": "node --test tests/*.test.mjs",
     "check": "npm run check:foundation && npm run check:requirements && npm run check:privacy-design && npm run check:workspaces && npm run check:packages && npm test",
-    "check:types": "tsc --project packages/contracts/tsconfig.json && tsc --project packages/config/tsconfig.json && tsc --project packages/database/tsconfig.json && tsc --project packages/operations/tsconfig.json && tsc --project packages/secure-intake/tsconfig.json && tsc --project packages/server/tsconfig.json && npm run check:types --workspace @heard/web",
+    "check:types": "tsc --project packages/contracts/tsconfig.json && tsc --project packages/config/tsconfig.json && tsc --project packages/database/tsconfig.json && tsc --project packages/operations/tsconfig.json && tsc --project packages/secure-intake/tsconfig.json && tsc --project packages/identity/tsconfig.json && tsc --project packages/server/tsconfig.json && npm run check:types --workspace @heard/web",
     "dev": "npm run dev --workspace @heard/web",
     "build": "npm run build --workspace @heard/web",
     "lint": "biome check apps/web/app apps/web/lib apps/web/next.config.mjs",
