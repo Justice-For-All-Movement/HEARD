@@ -17,7 +17,7 @@ A production deployment, live private intake, verified secure messaging, a domai
 
 | Field | State |
 |---|---|
-| Source implementation | HEARD-01 … HEARD-13 merged (see table). HEARD-14 onward not started. |
+| Source implementation | HEARD-01 … HEARD-14 merged (see table). HEARD-15 onward not started. |
 | Automated tests | `npm run check` (unit, contracts, registry), `test:database` (native PostgreSQL 17.11) and `test:database:wasm`, `test:server` (API against native PostgreSQL with a non-superuser login), `test:web` (production Next.js server). All pass on `main` in GitHub Actions (`foundation`, `database`). |
 | Security review | AI-assisted review and adversarial tests per owner policy (AGENTS.md). Independent human review / penetration test: **pending, deferred** (not a blocker). No certification claimed. |
 | Deployment | **Not deployed.** `render.yaml` and [DEPLOYMENT_RENDER.md](DEPLOYMENT_RENDER.md) are ready for the lead; no Render, Neon or B2 resource was created by the implementing agent. |
@@ -39,8 +39,9 @@ A production deployment, live private intake, verified secure messaging, a domai
 | HEARD-10/11 | #29 (stubs #16, #17) | Accessible wizard; encrypted drafts; idempotent receipts | INTAKE.md |
 | HEARD-12 | #30 (stub #18) | Resumable private uploads; storage adapters (memory/fs/S3-B2) | UPLOADS.md |
 | HEARD-13 | #31 (stub #19) | Quarantine, type/content checks, clamd scanning, cleared-only delivery, worker | QUARANTINE.md |
+| HEARD-14 | #33 | Immutable originals, DB-computed hash-chained handling ledger, byte verification, source statements, private manifest | EVIDENCE_LEDGER.md |
 
-Database migrations on `main`: `0001`–`0010` (checksum-bound; never edit applied files).
+Database migrations on `main`: `0001`–`0011` (checksum-bound; never edit applied files).
 
 ## Known blockers and gaps
 
@@ -61,7 +62,7 @@ npm run test:database && npm run test:database:wasm && npm run test:server
 npm run build && npm run test:web
 ```
 
-Next dependency-ready units: **HEARD-14** (evidence integrity/provenance ledger; builds on objects + audit), **HEARD-15** (durable job framework; generalize the scan-job leasing), then HEARD-16…19 media processing, HEARD-20/21 case workflow and reviewer console. Keep new RLS policies on the reviewed allowlist in `db/tests/no-permissive-policies.sql`, keep publications default-deny until HEARD-23, and map every merged PR in `registry/prs.json` (`npm run check:registry`).
+Next dependency-ready units: **HEARD-15** (durable job framework; generalize the scan-job leasing in `packages/quarantine` into a shared leased queue with dead-lettering and cancellation), then HEARD-16…19 media processing, HEARD-20/21 case workflow and reviewer console. Keep new RLS policies on the reviewed allowlist in `db/tests/no-permissive-policies.sql`, keep publications default-deny until HEARD-23, and map every merged PR in `registry/prs.json` (`npm run check:registry`).
 
 ## Discipline
 
