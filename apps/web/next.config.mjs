@@ -27,6 +27,8 @@ const config = {
     '@heard/operations',
     '@heard/secure-intake',
     '@heard/identity',
+    '@heard/authorization',
+    '@heard/consent',
   ],
   experimental: { cpus: 2 },
   async headers() {

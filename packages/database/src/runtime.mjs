@@ -1,7 +1,7 @@
 import pg from 'pg';
 
 /** Latest checksum-bound migration shipped with this release (asserted by tests against db/migrations). */
-export const LATEST_MIGRATION = 6;
+export const LATEST_MIGRATION = 7;
 
 export const SCOPED_ROLES = Object.freeze(['heard_api', 'heard_job_worker', 'heard_public_projector', 'heard_operator']);
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;

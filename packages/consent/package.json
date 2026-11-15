@@ -1,0 +1,12 @@
+{
+  "name": "@heard/consent",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {".": {"types": "./src/index.d.mts", "default": "./src/index.mjs"}},
+  "engines": {"node": ">=22"},
+  "dependencies": {
+    "@heard/authorization": "0.0.1",
+    "@heard/identity": "0.0.1"
+  }
+}

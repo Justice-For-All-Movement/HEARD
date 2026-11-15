@@ -33,7 +33,9 @@ DECLARE reviewed text[] := ARRAY[
   'heard_private_objects.heard_objects_owner_insert',
   'heard_resource_grants.heard_grants_visible',
   'heard_resource_grants.heard_grants_create',
-  'heard_resource_grants.heard_grants_revoke'
+  'heard_resource_grants.heard_grants_revoke',
+  'heard_consent_records.heard_consent_owner_read',
+  'heard_consent_records.heard_consent_owner_record'
 ];
 DECLARE scoped name[] := ARRAY['heard_api','heard_job_worker','heard_public_projector','heard_operator']::name[];
 BEGIN
