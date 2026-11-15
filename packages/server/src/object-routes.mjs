@@ -1,6 +1,7 @@
 /** HEARD-13 HTTP routes: list a case's objects and download cleared objects only. */
 import { authorizeCase, authorizeObject, withSession } from '@heard/authorization';
 import { actorKind, assertSource, caseManifest, recordEvent, verifyObjectBytes } from '@heard/evidence';
+import { cancelJob, caseJobs } from '@heard/jobs';
 import { isUuid } from '@heard/database';
 import { mapped } from './errors.mjs';
 import { HttpError, json, readJson } from './http.mjs';
@@ -66,6 +67,29 @@ export function objectsModule(context) {
               'referrer-policy': 'no-referrer',
             },
           });
+        }),
+      },
+      {
+        method: 'GET', pattern: /^\/api\/v1\/my\/cases\/([^/]+)\/jobs$/, label: '/api/v1/my/cases/:id/jobs',
+        handler: mapped(async (request, match) => {
+          requireIntake(config);
+          const session = await context.requireSession(request);
+          const caseId = id(match[1]);
+          return json(200, { jobs: await withSession(context.getPool(), session, async client => {
+            await authorizeCase(client, session, 'case.read', caseId);
+            return caseJobs(client, caseId);
+          }) });
+        }),
+      },
+      {
+        method: 'POST', pattern: /^\/api\/v1\/jobs\/([^/]+)\/cancel$/, label: '/api/v1/jobs/:id/cancel',
+        handler: mapped(async (request, match) => {
+          requireIntake(config);
+          requireSameOrigin(request, config);
+          const session = await context.requireSession(request);
+          const jobId = id(match[1]);
+          await withSession(context.getPool(), session, client => cancelJob(client, jobId));
+          return json(200, { jobId, state: 'cancelled' });
         }),
       },
       {

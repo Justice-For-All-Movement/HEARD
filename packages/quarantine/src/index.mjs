@@ -12,7 +12,7 @@
  */
 import { createHash, randomUUID } from 'node:crypto';
 import { connect } from 'node:net';
-import { withScope } from '@heard/database';
+import { JobError, enqueue, runJobs } from '@heard/jobs';
 
 export class ScanError extends Error {
   constructor(code) { super(code); this.code = code; this.name = 'ScanError'; }
@@ -145,23 +145,7 @@ const SIZE_LIMIT = 300 * 1024 * 1024;
 
 /** Enqueue a scan for a just-quarantined object (runs in the uploader's scoped transaction). */
 export async function enqueueScan(client, { objectId, caseId }) {
-  await client.query("INSERT INTO heard_jobs(case_id, object_id, kind, dedupe_key, max_attempts) VALUES($1,$2,'scan',$3,4)", [caseId, objectId, `scan:${objectId}`]);
-}
-
-const scope = { role: 'heard_job_worker', settings: { job_purpose: 'scan' } };
-
-/** Lease up to `limit` ready scan jobs (queued, or leased with an expired lease). */
-async function lease(pool, workerId, { limit, leaseMs }) {
-  return withScope(pool, scope, async client => {
-    // Exhausted jobs whose last lease expired are closed as failed; their objects stay quarantined.
-    await client.query("UPDATE heard_jobs SET state='failed', lease_owner=NULL, lease_until=NULL, last_error_code='LEASE_EXPIRED', finished_at=now() WHERE kind='scan' AND state='leased' AND lease_until < now() AND attempts >= max_attempts");
-    const ids = (await client.query(
-      "SELECT id FROM heard_jobs WHERE kind='scan' AND attempts < max_attempts AND available_at <= now() AND (state='queued' OR (state='leased' AND lease_until < now())) ORDER BY available_at LIMIT $1 FOR UPDATE SKIP LOCKED", [limit])).rows.map(r => r.id);
-    if (!ids.length) return [];
-    return (await client.query(
-      "UPDATE heard_jobs SET state='leased', lease_owner=$2, lease_until=now() + ($3::int * interval '1 millisecond'), attempts=attempts+1 WHERE id = ANY($1::uuid[]) RETURNING id, object_id, attempts, max_attempts",
-      [ids, workerId, leaseMs])).rows;
-  });
+  await enqueue(client, { kind: 'scan', caseId, objectId, dedupeKey: `scan:${objectId}`, maxAttempts: 4 });
 }
 
 /** Decide the outcome for one object. Pure apart from reading bytes. */
@@ -178,43 +162,42 @@ export async function evaluateObject({ storage, scanner, object }) {
 }
 
 /**
- * Process ready scan jobs once. Safe to run concurrently in several workers
- * (SKIP LOCKED leasing; compare-and-set completion by lease owner).
+ * Process ready scan jobs once on the HEARD-15 job framework (SKIP LOCKED leasing,
+ * lease-owner compare-and-set commits, backoff, dead-lettering). Safe to run in
+ * several workers concurrently.
  */
-export async function processScanJobs(pool, { storage, scanner, workerId = randomUUID(), limit = 5, leaseMs = 10 * 60_000 } = {}) {
-  const jobs = await lease(pool, workerId, { limit, leaseMs });
-  const outcomes = [];
-  for (const job of jobs) {
-    let outcome;
-    try {
-      const object = await withScope(pool, scope, async c => (await c.query('SELECT id, storage_ref, checksum_sha256, declared_type, size_bytes FROM heard_private_objects WHERE id=$1', [job.object_id])).rows[0]);
-      if (!object) throw new ScanError('OBJECT_NOT_VISIBLE');
-      outcome = await evaluateObject({ storage, scanner, object });
-    } catch (error) {
-      outcome = { state: 'retry', code: error instanceof ScanError ? error.code : 'SCAN_INTERNAL_ERROR' };
-    }
-    await withScope(pool, scope, async client => {
-      const owned = (await client.query("SELECT 1 FROM heard_jobs WHERE id=$1 AND state='leased' AND lease_owner=$2 FOR UPDATE", [job.id, workerId])).rows.length;
-      if (!owned) return; // lease lost; another worker owns the job now
-      if (outcome.state === 'retry') {
-        const exhausted = job.attempts >= job.max_attempts;
-        const verdict = outcome.code === 'SCANNER_UNAVAILABLE' ? 'unavailable' : 'error';
-        await client.query("UPDATE heard_private_objects SET scan_verdict=$2, quarantine_reason=$3 WHERE id=$1 AND quarantine_state='quarantined'", [job.object_id, verdict, exhausted ? 'scan_failed' : 'scan_pending']);
-        await client.query(
-          `UPDATE heard_jobs SET state=$2, lease_owner=NULL, lease_until=NULL, last_error_code=$3, available_at=now() + ($4::int * interval '1 millisecond'), finished_at=CASE WHEN $2='failed' THEN now() END WHERE id=$1`,
-          [job.id, exhausted ? 'failed' : 'queued', outcome.code, RETRY_BACKOFF_MS[Math.min(job.attempts - 1, RETRY_BACKOFF_MS.length - 1)]]);
-      } else {
-        // Chain-of-handling entry first, while the object is still quarantined (HEARD-14).
-        const detail = outcome.state === 'cleared' ? { engine: outcome.engine } : { reason: outcome.reason, ...(outcome.engine ? { engine: outcome.engine } : {}) };
-        await client.query("INSERT INTO heard_evidence_events(object_id, case_id, operation, actor_kind, actor_id, detail) SELECT id, case_id, $2, 'service', NULL, $3 FROM heard_private_objects WHERE id=$1",
-          [job.object_id, outcome.state === 'cleared' ? 'scan_cleared' : 'scan_rejected', detail]);
-        await client.query(
-          "UPDATE heard_private_objects SET quarantine_state=$2, quarantine_reason=$3, scan_verdict=$4, scan_engine=$5, scanned_at=now(), detected_type=$6 WHERE id=$1 AND quarantine_state='quarantined'",
-          [job.object_id, outcome.state, outcome.reason, outcome.verdict ?? null, outcome.engine ?? null, outcome.detectedType ?? null]);
-        await client.query("UPDATE heard_jobs SET state='succeeded', lease_owner=NULL, lease_until=NULL, last_error_code=NULL, finished_at=now() WHERE id=$1", [job.id]);
-      }
-    });
-    outcomes.push({ jobId: job.id, objectId: job.object_id, state: outcome.state, reason: outcome.reason ?? outcome.code ?? null });
-  }
-  return outcomes;
+export async function processScanJobs(pool, { storage, scanner, workerId = randomUUID(), limit = 5, leaseMs = 10 * 60_000, timeoutMs = 5 * 60_000 } = {}) {
+  const outcomes = new Map();
+  const results = await runJobs(pool, {
+    kind: 'scan', workerId, limit, leaseMs, timeoutMs, backoffMs: RETRY_BACKOFF_MS,
+    async handler(job, { read }) {
+      const object = await read(async c => (await c.query('SELECT id, storage_ref, checksum_sha256, declared_type, size_bytes FROM heard_private_objects WHERE id=$1', [job.objectId])).rows[0]);
+      if (!object) throw new JobError('OBJECT_NOT_VISIBLE');
+      let outcome;
+      try { outcome = await evaluateObject({ storage, scanner, object }); }
+      catch (error) { throw new JobError(error instanceof ScanError ? error.code : 'SCAN_INTERNAL_ERROR'); }
+      outcomes.set(job.id, outcome);
+      return {
+        async commit(client) {
+          // Chain-of-handling entry first, while the object is still quarantined (HEARD-14).
+          const detail = outcome.state === 'cleared' ? { engine: outcome.engine } : { reason: outcome.reason, ...(outcome.engine ? { engine: outcome.engine } : {}) };
+          await client.query("INSERT INTO heard_evidence_events(object_id, case_id, operation, actor_kind, actor_id, detail) SELECT id, case_id, $2, 'service', NULL, $3 FROM heard_private_objects WHERE id=$1",
+            [job.objectId, outcome.state === 'cleared' ? 'scan_cleared' : 'scan_rejected', detail]);
+          await client.query(
+            "UPDATE heard_private_objects SET quarantine_state=$2, quarantine_reason=$3, scan_verdict=$4, scan_engine=$5, scanned_at=now(), detected_type=$6 WHERE id=$1 AND quarantine_state='quarantined'",
+            [job.objectId, outcome.state, outcome.reason, outcome.verdict ?? null, outcome.engine ?? null, outcome.detectedType ?? null]);
+        },
+      };
+    },
+    // Not a verdict: the object stays quarantined; exhausted retries leave it 'scan_failed'.
+    async onFailure(client, { job, code, final }) {
+      await client.query("UPDATE heard_private_objects SET scan_verdict=$2, quarantine_reason=$3 WHERE id=$1 AND quarantine_state='quarantined'",
+        [job.objectId, code === 'SCANNER_UNAVAILABLE' ? 'unavailable' : 'error', final ? 'scan_failed' : 'scan_pending']);
+    },
+  });
+  return results.map(r => {
+    const outcome = outcomes.get(r.jobId);
+    if (r.outcome === 'succeeded' && outcome) return { jobId: r.jobId, objectId: r.objectId, state: outcome.state, reason: outcome.reason ?? null };
+    return { jobId: r.jobId, objectId: r.objectId, state: r.outcome === 'lease_lost' ? 'lease_lost' : 'retry', reason: r.code };
+  });
 }

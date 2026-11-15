@@ -41,8 +41,8 @@ test('database readiness, environment binding and scoped roles on native Postgre
       await admin.query('GRANT heard_api TO heard_test_runtime WITH INHERIT FALSE, SET TRUE');
       const runtime = pool('heard_test_runtime');
       await admin.query(await (await import('node:fs/promises')).readFile('db/fixtures/synthetic.sql', 'utf8'));
-      const count = await withScope(runtime, { subjectId: '00000000-0000-4000-8000-000000000001' }, c => c.query('SELECT count(*)::int AS n FROM heard_jobs').catch(e => e.code));
-      assert.equal(count, '42501', 'heard_api has no job privileges');
+      const count = await withScope(runtime, { subjectId: '00000000-0000-4000-8000-000000000001' }, c => c.query('SELECT count(*)::int AS n FROM heard_publications').catch(e => e.code));
+      assert.equal(count, '42501', 'heard_api has no publication privileges');
       // Without inherited privileges, the login role itself cannot read private tables directly.
       await assert.rejects(runtime.query('SELECT * FROM heard_cases'), { code: '42501' });
       await assert.rejects(withScope(runtime, { role: 'postgres' }, async () => {}), /Unknown scoped role/);
