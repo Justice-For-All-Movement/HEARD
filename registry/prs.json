@@ -1,5 +1,5 @@
 {
-  "repository": "neophilism/HEARD",
+  "repository": "Justice-For-All-Movement/HEARD",
   "title": "HEARD",
   "planVerified": true,
   "plannedPrCount": 48,
@@ -8,13 +8,15 @@
   ],
   "schemaVersion": 1,
   "roadmapVersion": 1,
-  "observedAt": "2026-10-11T17:41:26.229Z",
+  "observedAt": "2026-11-15T19:14:43Z",
   "units": [
     {
       "id": "HEARD-01",
       "title": "Product charter and requirements ledger",
       "origin": "original",
-      "prs": [],
+      "prs": [
+        7
+      ],
       "dependsOn": [],
       "externalDependencies": [],
       "externalPrerequisites": []
@@ -23,8 +25,12 @@
       "id": "HEARD-02",
       "title": "Threat model, data map and privacy architecture",
       "origin": "original",
-      "prs": [],
-      "dependsOn": [],
+      "prs": [
+        8
+      ],
+      "dependsOn": [
+        "HEARD-01"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -32,107 +38,197 @@
       "id": "HEARD-03",
       "title": "Monorepo, type safety, development tooling and CI",
       "origin": "original",
-      "prs": [],
-      "dependsOn": [],
+      "prs": [
+        22
+      ],
+      "dependsOn": [
+        "HEARD-01"
+      ],
       "externalDependencies": [],
-      "externalPrerequisites": []
+      "externalPrerequisites": [],
+      "priorEvidencePrs": [
+        9,
+        21
+      ]
     },
     {
       "id": "HEARD-04",
       "title": "Versioned PostgreSQL schema and fixtures",
       "origin": "original",
-      "prs": [],
-      "dependsOn": [],
+      "prs": [
+        23
+      ],
+      "dependsOn": [
+        "HEARD-02",
+        "HEARD-03"
+      ],
       "externalDependencies": [],
-      "externalPrerequisites": []
+      "externalPrerequisites": [],
+      "priorEvidencePrs": [
+        10
+      ]
     },
     {
       "id": "HEARD-05",
       "title": "Secure Intake engine adapter and compatibility contracts",
       "origin": "original",
-      "prs": [],
-      "dependsOn": [],
+      "prs": [
+        25
+      ],
+      "dependsOn": [
+        "HEARD-02",
+        "HEARD-04"
+      ],
       "externalDependencies": [],
-      "externalPrerequisites": []
+      "externalPrerequisites": [],
+      "priorEvidencePrs": [
+        11
+      ]
     },
     {
       "id": "HEARD-06",
       "title": "Environment configuration, readiness and operational skeleton",
       "origin": "original",
-      "prs": [],
-      "dependsOn": [],
+      "prs": [
+        24
+      ],
+      "dependsOn": [
+        "HEARD-03",
+        "HEARD-04"
+      ],
       "externalDependencies": [],
-      "externalPrerequisites": []
+      "externalPrerequisites": [],
+      "priorEvidencePrs": [
+        12
+      ]
     },
     {
       "id": "HEARD-07",
       "title": "Accounts, pseudonyms and anonymous recovery",
       "origin": "original",
-      "prs": [],
-      "dependsOn": [],
+      "prs": [
+        26
+      ],
+      "dependsOn": [
+        "HEARD-04",
+        "HEARD-06"
+      ],
       "externalDependencies": [],
-      "externalPrerequisites": []
+      "externalPrerequisites": [],
+      "priorEvidencePrs": [
+        13
+      ]
     },
     {
       "id": "HEARD-08",
       "title": "Deny-by-default resource authorization",
       "origin": "original",
-      "prs": [],
-      "dependsOn": [],
+      "prs": [
+        27
+      ],
+      "dependsOn": [
+        "HEARD-05",
+        "HEARD-07"
+      ],
       "externalDependencies": [],
-      "externalPrerequisites": []
+      "externalPrerequisites": [],
+      "priorEvidencePrs": [
+        14
+      ]
     },
     {
       "id": "HEARD-09",
       "title": "Privacy choice and versioned consent engine",
       "origin": "original",
-      "prs": [],
-      "dependsOn": [],
+      "prs": [
+        28
+      ],
+      "dependsOn": [
+        "HEARD-07",
+        "HEARD-08"
+      ],
       "externalDependencies": [],
-      "externalPrerequisites": []
+      "externalPrerequisites": [],
+      "priorEvidencePrs": [
+        15
+      ]
     },
     {
       "id": "HEARD-10",
       "title": "Accessible testimony intake wizard",
       "origin": "original",
-      "prs": [],
-      "dependsOn": [],
+      "prs": [
+        29
+      ],
+      "dependsOn": [
+        "HEARD-09"
+      ],
       "externalDependencies": [],
-      "externalPrerequisites": []
+      "externalPrerequisites": [],
+      "priorEvidencePrs": [
+        16
+      ]
     },
     {
       "id": "HEARD-11",
       "title": "Secure drafts, recovery and submit receipt",
       "origin": "original",
-      "prs": [],
-      "dependsOn": [],
+      "prs": [
+        29
+      ],
+      "dependsOn": [
+        "HEARD-07",
+        "HEARD-09",
+        "HEARD-10"
+      ],
       "externalDependencies": [],
-      "externalPrerequisites": []
+      "externalPrerequisites": [],
+      "priorEvidencePrs": [
+        17
+      ]
     },
     {
       "id": "HEARD-12",
       "title": "Resumable private object uploads",
       "origin": "original",
-      "prs": [],
-      "dependsOn": [],
+      "prs": [
+        30
+      ],
+      "dependsOn": [
+        "HEARD-08",
+        "HEARD-11"
+      ],
       "externalDependencies": [],
-      "externalPrerequisites": []
+      "externalPrerequisites": [],
+      "priorEvidencePrs": [
+        18
+      ]
     },
     {
       "id": "HEARD-13",
       "title": "Malware quarantine and parser safety",
       "origin": "original",
-      "prs": [],
-      "dependsOn": [],
+      "prs": [
+        31
+      ],
+      "dependsOn": [
+        "HEARD-12"
+      ],
       "externalDependencies": [],
-      "externalPrerequisites": []
+      "externalPrerequisites": [],
+      "priorEvidencePrs": [
+        19
+      ]
     },
     {
       "id": "HEARD-14",
       "title": "Evidence integrity, provenance and handling ledger",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-12",
+        "HEARD-13"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -141,7 +237,11 @@
       "title": "Durable constrained media-job framework",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-06",
+        "HEARD-13",
+        "HEARD-14"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -150,7 +250,9 @@
       "title": "Original-preserving media normalization",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-15"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -159,7 +261,9 @@
       "title": "Anonymization and visual/audio redaction editor",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-16"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -168,7 +272,10 @@
       "title": "Editable transcripts and accessible captions",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-15",
+        "HEARD-16"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -177,7 +284,11 @@
       "title": "Contributor/redaction-review approval gate",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-09",
+        "HEARD-17",
+        "HEARD-18"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -186,7 +297,11 @@
       "title": "Complete case workflow state machine",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-05",
+        "HEARD-11",
+        "HEARD-14"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -195,7 +310,10 @@
       "title": "Restricted reviewer console and triage",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-08",
+        "HEARD-20"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -204,7 +322,11 @@
       "title": "Contributor status and follow-up inbox",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-07",
+        "HEARD-20",
+        "HEARD-21"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -213,7 +335,13 @@
       "title": "Consent-bound publication projector",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-09",
+        "HEARD-14",
+        "HEARD-20",
+        "HEARD-21",
+        "HEARD-19"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -222,7 +350,9 @@
       "title": "Public Archive pages and media player",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-23"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -231,7 +361,10 @@
       "title": "Public search, filtering and discovery",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-23",
+        "HEARD-24"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -240,7 +373,11 @@
       "title": "Evidentiary and source-status presentation",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-14",
+        "HEARD-21",
+        "HEARD-24"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -249,7 +386,11 @@
       "title": "Amendments, corrections, withdrawal and public revisions",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-23",
+        "HEARD-24",
+        "HEARD-25"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -258,7 +399,11 @@
       "title": "Content disputes, abuse reports and legally reviewed release policy",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-21",
+        "HEARD-26",
+        "HEARD-27"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -267,7 +412,10 @@
       "title": "Helper registry, categories and credential verification",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-07",
+        "HEARD-08"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -276,7 +424,10 @@
       "title": "Mediated “I can help” offers",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-22",
+        "HEARD-29"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -285,7 +436,11 @@
       "title": "Contributor-controlled fine-grained evidence grants",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-08",
+        "HEARD-09",
+        "HEARD-30"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -294,7 +449,11 @@
       "title": "Protected contributor-helper messaging",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-02",
+        "HEARD-07",
+        "HEARD-31"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -303,7 +462,11 @@
       "title": "Restricted case collaboration, tasks and notes",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-20",
+        "HEARD-30",
+        "HEARD-31"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -312,7 +475,11 @@
       "title": "Minimal, reliable participant notifications",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-22",
+        "HEARD-30",
+        "HEARD-32"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -321,7 +488,11 @@
       "title": "Partner organizations and scoped referrals",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-29",
+        "HEARD-31",
+        "HEARD-33"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -330,7 +501,11 @@
       "title": "Justice For All core platform integration",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-07",
+        "HEARD-24",
+        "HEARD-29"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -339,7 +514,10 @@
       "title": "FOIA Aggregator citation and public-source bridge",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-24",
+        "HEARD-26"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -348,7 +526,11 @@
       "title": "Optional Liberty Nodes public dissemination export",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-23",
+        "HEARD-27",
+        "HEARD-36"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -357,7 +539,12 @@
       "title": "Typed public/partner API, signed events and SDK",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-20",
+        "HEARD-23",
+        "HEARD-30",
+        "HEARD-35"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -366,7 +553,16 @@
       "title": "E2EESA evidence register and conformance remediation",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-02",
+        "HEARD-08",
+        "HEARD-09",
+        "HEARD-23",
+        "HEARD-31",
+        "HEARD-32",
+        "HEARD-38",
+        "HEARD-39"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -375,7 +571,12 @@
       "title": "Participant data export, retention and deletion requests",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-14",
+        "HEARD-23",
+        "HEARD-27",
+        "HEARD-31"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -384,7 +585,12 @@
       "title": "Privacy-preserving analytics and administrator operations",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-20",
+        "HEARD-24",
+        "HEARD-30",
+        "HEARD-41"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -393,7 +599,15 @@
       "title": "Security hardening and adversarial test suite",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-13",
+        "HEARD-21",
+        "HEARD-23",
+        "HEARD-31",
+        "HEARD-32",
+        "HEARD-39",
+        "HEARD-40"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -402,7 +616,12 @@
       "title": "WCAG 2.2 AA, usability and language review",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-10",
+        "HEARD-17",
+        "HEARD-24",
+        "HEARD-30"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -411,7 +630,13 @@
       "title": "Reliability, recovery, capacity and cost safety",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-06",
+        "HEARD-15",
+        "HEARD-23",
+        "HEARD-41",
+        "HEARD-42"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -420,7 +645,13 @@
       "title": "Production-ready Render/Neon/B2 deployment",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-06",
+        "HEARD-23",
+        "HEARD-32",
+        "HEARD-43",
+        "HEARD-45"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -429,7 +660,11 @@
       "title": "Engine Room integration and operating evidence",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-39",
+        "HEARD-42",
+        "HEARD-46"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     },
@@ -438,10 +673,393 @@
       "title": "Controlled beta, independent review and GA release gate",
       "origin": "original",
       "prs": [],
-      "dependsOn": [],
+      "dependsOn": [
+        "HEARD-28",
+        "HEARD-35",
+        "HEARD-38",
+        "HEARD-40",
+        "HEARD-43",
+        "HEARD-44",
+        "HEARD-45",
+        "HEARD-46",
+        "HEARD-47"
+      ],
       "externalDependencies": [],
       "externalPrerequisites": []
     }
   ],
-  "pullRequests": []
+  "pullRequests": [
+    {
+      "id": 4830374726,
+      "number": 1,
+      "title": "Track E2EESA implementation, full testing and independent expert review",
+      "state": "closed",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/1",
+      "createdAt": "2026-10-12T13:51:01Z",
+      "updatedAt": "2026-10-12T14:19:57Z",
+      "mergedAt": "2026-10-12T14:19:57Z",
+      "closedAt": "2026-10-12T14:19:57Z",
+      "draft": false
+    },
+    {
+      "id": 4830776907,
+      "number": 2,
+      "title": "Manual-only ARM64 cloud runner smoke test (no hosted minutes)",
+      "state": "open",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/2",
+      "createdAt": "2026-10-12T14:23:40Z",
+      "updatedAt": "2026-10-12T14:23:40Z",
+      "mergedAt": null,
+      "closedAt": null,
+      "draft": false
+    },
+    {
+      "id": 4831946462,
+      "number": 3,
+      "title": "Port full CI verification to CircleCI Free without dropping checks",
+      "state": "closed",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/3",
+      "createdAt": "2026-10-12T16:03:54Z",
+      "updatedAt": "2026-10-12T20:42:59Z",
+      "mergedAt": "2026-10-12T20:42:59Z",
+      "closedAt": "2026-10-12T20:42:59Z",
+      "draft": false
+    },
+    {
+      "id": 4834787592,
+      "number": 4,
+      "title": "Verify automatic CircleCI PR trigger without weakening required checks",
+      "state": "closed",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/4",
+      "createdAt": "2026-10-12T20:44:28Z",
+      "updatedAt": "2026-10-12T20:45:18Z",
+      "mergedAt": "2026-10-12T20:45:18Z",
+      "closedAt": "2026-10-12T20:45:18Z",
+      "draft": false
+    },
+    {
+      "id": 4848101887,
+      "number": 5,
+      "title": "Owner policy: proceed with AI security review; defer external audit",
+      "state": "closed",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/5",
+      "createdAt": "2026-10-13T19:04:09Z",
+      "updatedAt": "2026-10-13T20:35:43Z",
+      "mergedAt": "2026-10-13T20:35:42Z",
+      "closedAt": "2026-10-13T20:35:42Z",
+      "draft": false
+    },
+    {
+      "id": 4848615068,
+      "number": 6,
+      "title": "Standardize canonical PR registry for Boardroom and Engine Room",
+      "state": "closed",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/6",
+      "createdAt": "2026-10-13T19:49:08Z",
+      "updatedAt": "2026-10-16T15:34:20Z",
+      "mergedAt": "2026-10-16T15:34:19Z",
+      "closedAt": "2026-10-16T15:34:19Z",
+      "draft": false
+    },
+    {
+      "id": 4913031930,
+      "number": 7,
+      "title": "HEARD-01: Product charter and requirements ledger",
+      "state": "closed",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/7",
+      "createdAt": "2026-10-18T21:38:47Z",
+      "updatedAt": "2026-11-01T23:42:58Z",
+      "mergedAt": "2026-11-01T23:42:57Z",
+      "closedAt": "2026-11-01T23:42:58Z",
+      "draft": false
+    },
+    {
+      "id": 4913038944,
+      "number": 8,
+      "title": "HEARD-02: Threat model, data map and privacy architecture",
+      "state": "closed",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/8",
+      "createdAt": "2026-10-18T21:39:46Z",
+      "updatedAt": "2026-11-01T23:45:24Z",
+      "mergedAt": "2026-11-01T23:45:24Z",
+      "closedAt": "2026-11-01T23:45:24Z",
+      "draft": false
+    },
+    {
+      "id": 4913043780,
+      "number": 9,
+      "title": "HEARD-03: Monorepo, type safety, development tooling and CI",
+      "state": "closed",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/9",
+      "createdAt": "2026-10-18T21:40:24Z",
+      "updatedAt": "2026-11-15T18:20:57Z",
+      "mergedAt": null,
+      "closedAt": "2026-11-15T18:20:57Z",
+      "draft": true
+    },
+    {
+      "id": 4913049617,
+      "number": 10,
+      "title": "HEARD-04: Versioned PostgreSQL schema and fixtures",
+      "state": "closed",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/10",
+      "createdAt": "2026-10-18T21:41:12Z",
+      "updatedAt": "2026-11-15T18:22:59Z",
+      "mergedAt": null,
+      "closedAt": "2026-11-15T18:22:59Z",
+      "draft": true
+    },
+    {
+      "id": 4913057676,
+      "number": 11,
+      "title": "HEARD-05: Secure Intake engine adapter and compatibility contracts",
+      "state": "closed",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/11",
+      "createdAt": "2026-10-18T21:42:16Z",
+      "updatedAt": "2026-11-15T18:35:47Z",
+      "mergedAt": null,
+      "closedAt": "2026-11-15T18:35:47Z",
+      "draft": true
+    },
+    {
+      "id": 4913064251,
+      "number": 12,
+      "title": "HEARD-06: Environment configuration, readiness and operational skeleton",
+      "state": "closed",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/12",
+      "createdAt": "2026-10-18T21:43:08Z",
+      "updatedAt": "2026-11-15T18:35:31Z",
+      "mergedAt": null,
+      "closedAt": "2026-11-15T18:35:31Z",
+      "draft": true
+    },
+    {
+      "id": 4913070348,
+      "number": 13,
+      "title": "HEARD-07: Accounts, pseudonyms and anonymous recovery",
+      "state": "closed",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/13",
+      "createdAt": "2026-10-18T21:43:57Z",
+      "updatedAt": "2026-11-15T18:42:20Z",
+      "mergedAt": null,
+      "closedAt": "2026-11-15T18:42:20Z",
+      "draft": true
+    },
+    {
+      "id": 4913075383,
+      "number": 14,
+      "title": "HEARD-08: Deny-by-default resource authorization",
+      "state": "closed",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/14",
+      "createdAt": "2026-10-18T21:44:39Z",
+      "updatedAt": "2026-11-15T18:46:58Z",
+      "mergedAt": null,
+      "closedAt": "2026-11-15T18:46:58Z",
+      "draft": true
+    },
+    {
+      "id": 4913079884,
+      "number": 15,
+      "title": "HEARD-09: Privacy choice and versioned consent engine",
+      "state": "closed",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/15",
+      "createdAt": "2026-10-18T21:45:15Z",
+      "updatedAt": "2026-11-15T18:50:28Z",
+      "mergedAt": null,
+      "closedAt": "2026-11-15T18:50:28Z",
+      "draft": true
+    },
+    {
+      "id": 4913085439,
+      "number": 16,
+      "title": "HEARD-10: Accessible testimony intake wizard",
+      "state": "closed",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/16",
+      "createdAt": "2026-10-18T21:45:58Z",
+      "updatedAt": "2026-11-15T19:00:51Z",
+      "mergedAt": null,
+      "closedAt": "2026-11-15T19:00:51Z",
+      "draft": true
+    },
+    {
+      "id": 4913090463,
+      "number": 17,
+      "title": "HEARD-11: Secure drafts, recovery and submit receipt",
+      "state": "closed",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/17",
+      "createdAt": "2026-10-18T21:46:36Z",
+      "updatedAt": "2026-11-15T19:00:53Z",
+      "mergedAt": null,
+      "closedAt": "2026-11-15T19:00:53Z",
+      "draft": true
+    },
+    {
+      "id": 4913095603,
+      "number": 18,
+      "title": "HEARD-12: Resumable private object uploads",
+      "state": "closed",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/18",
+      "createdAt": "2026-10-18T21:47:15Z",
+      "updatedAt": "2026-11-15T19:06:51Z",
+      "mergedAt": null,
+      "closedAt": "2026-11-15T19:06:51Z",
+      "draft": true
+    },
+    {
+      "id": 4913100934,
+      "number": 19,
+      "title": "HEARD-13: Malware quarantine and parser safety",
+      "state": "closed",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/19",
+      "createdAt": "2026-10-18T21:47:55Z",
+      "updatedAt": "2026-11-15T19:14:27Z",
+      "mergedAt": null,
+      "closedAt": "2026-11-15T19:14:27Z",
+      "draft": true
+    },
+    {
+      "id": 4941665425,
+      "number": 20,
+      "title": "Integrate Development Deployment Monitor (inventory-only)",
+      "state": "closed",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/20",
+      "createdAt": "2026-10-20T19:58:57Z",
+      "updatedAt": "2026-10-20T20:04:54Z",
+      "mergedAt": "2026-10-20T20:04:54Z",
+      "closedAt": "2026-10-20T20:04:54Z",
+      "draft": false
+    },
+    {
+      "id": 5112880262,
+      "number": 21,
+      "title": "HEARD-03: Complete workspace, app shell and CI",
+      "state": "closed",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/21",
+      "createdAt": "2026-11-02T00:01:18Z",
+      "updatedAt": "2026-11-02T00:03:43Z",
+      "mergedAt": null,
+      "closedAt": "2026-11-02T00:03:43Z",
+      "draft": true
+    },
+    {
+      "id": 5325722503,
+      "number": 22,
+      "title": "HEARD-03: Monorepo, type safety, development tooling and CI",
+      "state": "closed",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/22",
+      "createdAt": "2026-11-15T18:20:59Z",
+      "updatedAt": "2026-11-15T18:21:10Z",
+      "mergedAt": "2026-11-15T18:21:09Z",
+      "closedAt": "2026-11-15T18:21:09Z",
+      "draft": false
+    },
+    {
+      "id": 5325739805,
+      "number": 23,
+      "title": "HEARD-04: Versioned PostgreSQL schema and fixtures",
+      "state": "closed",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/23",
+      "createdAt": "2026-11-15T18:23:01Z",
+      "updatedAt": "2026-11-15T18:24:20Z",
+      "mergedAt": "2026-11-15T18:24:20Z",
+      "closedAt": "2026-11-15T18:24:20Z",
+      "draft": false
+    },
+    {
+      "id": 5325827893,
+      "number": 24,
+      "title": "HEARD-06: Environment configuration, readiness and deployable Node web service",
+      "state": "closed",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/24",
+      "createdAt": "2026-11-15T18:33:21Z",
+      "updatedAt": "2026-11-15T18:35:28Z",
+      "mergedAt": "2026-11-15T18:35:28Z",
+      "closedAt": "2026-11-15T18:35:28Z",
+      "draft": false
+    },
+    {
+      "id": 5325848638,
+      "number": 25,
+      "title": "HEARD-05: Secure Intake engine adapter and compatibility contracts",
+      "state": "closed",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/25",
+      "createdAt": "2026-11-15T18:35:44Z",
+      "updatedAt": "2026-11-15T18:42:13Z",
+      "mergedAt": "2026-11-15T18:42:13Z",
+      "closedAt": "2026-11-15T18:42:13Z",
+      "draft": false
+    },
+    {
+      "id": 5325905051,
+      "number": 26,
+      "title": "HEARD-07: Anonymous principals, one-time recovery, sessions and pseudonyms",
+      "state": "closed",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/26",
+      "createdAt": "2026-11-15T18:42:18Z",
+      "updatedAt": "2026-11-15T18:46:42Z",
+      "mergedAt": "2026-11-15T18:46:42Z",
+      "closedAt": "2026-11-15T18:46:42Z",
+      "draft": false
+    },
+    {
+      "id": 5325946607,
+      "number": 27,
+      "title": "HEARD-08: Deny-by-default resource authorization",
+      "state": "closed",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/27",
+      "createdAt": "2026-11-15T18:46:56Z",
+      "updatedAt": "2026-11-15T18:50:21Z",
+      "mergedAt": "2026-11-15T18:50:20Z",
+      "closedAt": "2026-11-15T18:50:20Z",
+      "draft": false
+    },
+    {
+      "id": 5325975449,
+      "number": 28,
+      "title": "HEARD-09: Privacy choice and versioned consent engine",
+      "state": "closed",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/28",
+      "createdAt": "2026-11-15T18:50:26Z",
+      "updatedAt": "2026-11-15T19:00:45Z",
+      "mergedAt": "2026-11-15T19:00:45Z",
+      "closedAt": "2026-11-15T19:00:45Z",
+      "draft": false
+    },
+    {
+      "id": 5326064712,
+      "number": 29,
+      "title": "HEARD-10/11: Accessible intake wizard, encrypted drafts and idempotent receipts",
+      "state": "closed",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/29",
+      "createdAt": "2026-11-15T19:00:49Z",
+      "updatedAt": "2026-11-15T19:06:34Z",
+      "mergedAt": "2026-11-15T19:06:34Z",
+      "closedAt": "2026-11-15T19:06:34Z",
+      "draft": false
+    },
+    {
+      "id": 5326117703,
+      "number": 30,
+      "title": "HEARD-12: Resumable private object uploads",
+      "state": "closed",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/30",
+      "createdAt": "2026-11-15T19:06:50Z",
+      "updatedAt": "2026-11-15T19:14:21Z",
+      "mergedAt": "2026-11-15T19:14:21Z",
+      "closedAt": "2026-11-15T19:14:21Z",
+      "draft": false
+    },
+    {
+      "id": 5326189887,
+      "number": 31,
+      "title": "HEARD-13: Malware quarantine, parser safety and cleared-only delivery",
+      "state": "open",
+      "url": "https://github.com/Justice-For-All-Movement/HEARD/pull/31",
+      "createdAt": "2026-11-15T19:14:25Z",
+      "updatedAt": "2026-11-15T19:14:25Z",
+      "mergedAt": null,
+      "closedAt": null,
+      "draft": false
+    }
+  ]
 }

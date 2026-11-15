@@ -1,48 +1,68 @@
 # HEARD — independent-account handoff
 
-**Repository:** https://github.com/neophilism/HEARD  
+**Repository:** https://github.com/Justice-For-All-Movement/HEARD (default branch `main`)  
 **Product:** HEARD, an initiative of Justice For All  
 **Positioning:** *Your rights. Your voice. Your next step.*  
-**Primary specification:** [DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md)  
+**Primary specification:** [DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md) · **PR register:** [../registry/prs.json](../registry/prs.json)  
 **Public copy and editorial policy:** [CONTENT_STRATEGY.md](CONTENT_STRATEGY.md) and [../content/site-copy.json](../content/site-copy.json)  
-**Date:** 2026-10-10
+**Last updated:** 2026-11-15
 
 ## Product and experience
 
-HEARD brings rights information, practical support, and firsthand experiences together in one place. Its primary services are a rights library, questions and help, experience/evidence preservation, a reviewed public archive, and ways to help others. Its voice is clear, welcoming, and specific: people should immediately see what HEARD offers and how to begin.
+HEARD brings rights information, practical support, and firsthand experiences together in one place. Its primary services are a rights library, questions and help, experience/evidence preservation, a reviewed public archive, and ways to help others. The homepage has six independent pathways and uses the canonical language from `content/site-copy.json`.
 
-The homepage has six independent pathways—know your rights, ask a question, find support, share an experience, help someone else, explore stories—and must use the canonical approved language from `content/site-copy.json`. The educational and help pathways are not mere lead-ins to public testimony.
+## Status (separate fields — do not conflate)
 
-## Engineering and safety requirements
+A production deployment, live private intake, verified secure messaging, a domain and Engine Room monitoring have **not been established**.
 
-- Rights-specific materials require jurisdiction, citations, a review date, and editorial/legal quality controls.
-- Distinguish personal accounts, source documents, independent corroboration, and disputes or corrections.
-- Private inquiries, evidence, selected helper disclosures, public publication and distributed archival are separate permissions and processing domains.
-- Treat storage, contact information, authentication, recipient choices and confidentiality as consequential decisions; all security promises must match tested implementation.
-- Confidential server-managed intake is not automatically E2EE. Component/flow E2EESA claims require evidence, not only a settings file or fixture pass.
-- Restrict original material to authorized recipients, and use separately approved redacted derivatives for public release.
-- Do not activate sensitive intake or promise secure communication before security, privacy, legal, operational and incident-response reviews are satisfied.
+| Field | State |
+|---|---|
+| Source implementation | HEARD-01 … HEARD-13 merged (see table). HEARD-14 onward not started. |
+| Automated tests | `npm run check` (unit, contracts, registry), `test:database` (native PostgreSQL 17.11) and `test:database:wasm`, `test:server` (API against native PostgreSQL with a non-superuser login), `test:web` (production Next.js server). All pass on `main` in GitHub Actions (`foundation`, `database`). |
+| Security review | AI-assisted review and adversarial tests per owner policy (AGENTS.md). Independent human review / penetration test: **pending, deferred** (not a blocker). No certification claimed. |
+| Deployment | **Not deployed.** `render.yaml` and [DEPLOYMENT_RENDER.md](DEPLOYMENT_RENDER.md) are ready for the lead; no Render, Neon or B2 resource was created by the implementing agent. |
+| Sensitive intake | **Disabled by default** (`HEARD_INTAKE_ENABLED=false`). Do not enable for real contributors before the §16 release gates. |
 
-## Verified repository state
+## Merged work units
 
-- GitHub contains the specification, editorial/content files, development handoff, basic checks and CI workflow.
-- A running application, database, production intake, deployment, domain, verified secure messaging and Engine Room monitoring have **not** been established by the foundational commits.
-- Roadmap work packages `HEARD-01` through `HEARD-48` are planning identifiers, **not** GitHub PR numbers or evidence of completed features.
-- No genuine case information, contact details or privileged material should be committed to source control, fixtures, issue comments or logs.
+| Unit | PR | Summary | Design / limits |
+|---|---|---|---|
+| HEARD-01 | #7 | Product charter, requirements ledger | PRODUCT_REQUIREMENTS.md |
+| HEARD-02 | #8 | Threat model, data map, privacy architecture | THREAT_MODEL.md |
+| HEARD-03 | #22 (draft #9 superseded) | npm workspaces, strict TS, Biome, secretlint, history scan, CI, artifact | WORKSPACE_PLAN.md |
+| HEARD-04 | #23 (draft #10) | Checksum-bound migrator, default-deny RLS, scoped roles, fixtures | SCHEMA_MIGRATION_NOTES.md |
+| HEARD-05 | #25 (stub #11) | Secure Intake adapter: local PostgreSQL implementation; remote fail-closed | SECURE_INTAKE_ADAPTER.md |
+| HEARD-06 | #24 (stub #12) | Config schema, liveness/readiness, redacted logs, env binding, Node web service, render.yaml | DEPLOYMENT_RENDER.md |
+| HEARD-07 | #26 (stub #13) | Anonymous principals, one-time recovery codes, sessions, pseudonyms, staff MFA assurance | IDENTITY.md |
+| HEARD-08 | #27 (stub #14) | Policy-as-code + RLS, assignments, grants, audited denials | AUTHORIZATION.md |
+| HEARD-09 | #28 (stub #15) | Versioned, digest-bound, append-only consent; preview | CONSENT.md |
+| HEARD-10/11 | #29 (stubs #16, #17) | Accessible wizard; encrypted drafts; idempotent receipts | INTAKE.md |
+| HEARD-12 | #30 (stub #18) | Resumable private uploads; storage adapters (memory/fs/S3-B2) | UPLOADS.md |
+| HEARD-13 | #31 (stub #19) | Quarantine, type/content checks, clamd scanning, cleared-only delivery, worker | QUARANTINE.md |
 
-## Immediate development sequence
+Database migrations on `main`: `0001`–`0010` (checksum-bound; never edit applied files).
 
-1. Read the README, the full development plan, `docs/CONTENT_STRATEGY.md`, and `content/site-copy.json`. Verify the current branch, CI and commit history.
-2. Confirm actual upstream interfaces and compatible versions of Secure Intake & Case Workflow Engine, E2EESA, FOIA Aggregator, Justice For All and Engine Room.
-3. Build the accessible application shell and route structure, using the canonical copy instead of hardcoded alternative wording.
-4. Add rights guide schema, source-review records and public browsing first; keep unreviewed rights examples fictional or clearly marked as samples.
-5. Implement protected inquiry, private records, assistance and publication as separately tested services in dependency order.
-6. Keep real status evidence for each PR: actual link and merge state, build/test results, migration/rollback, release SHA, deployment readiness and known issues.
+## Known blockers and gaps
 
-## Infrastructure status
+- **Secure Intake engine (remote):** upstream API/version/signing contract not verified against a deployed engine; the local adapter is used. See SECURE_INTAKE_ADAPTER.md.
+- **External services not provisioned:** Neon database, B2 bucket, ClamAV, email provider, signing keys. Every one sits behind an interface with a fake/local adapter and documented variables.
+- **Identity:** named accounts with passkeys and an HTTP staff MFA ceremony are not implemented; staff provisioning is operator-script only.
+- **Accessibility:** wizard follows WCAG patterns but has not had browser/assistive-technology or axe testing (HEARD-44).
+- **Rate limiting** is per process; multi-instance deployment needs a shared limiter.
+- `security/e2eesa-*.json` and `.github/deployment-monitor.json` still name `neophilism/HEARD` because their validators/consumers (E2EESA status contract, Development Deployment Monitor) are separate cross-repository contracts; update them together with those consumers.
+- Branches `boardroom/HEARD-05` … `boardroom/HEARD-13` and `agent/heard-03-complete` are superseded (their PRs are closed); they can be deleted by the owner.
 
-TypeScript/Next.js and PostgreSQL with separate workers and private object storage are planning choices, not a statement that production services have been configured. Render, Neon and B2 resources and keys must be obtained and verified at the appropriate milestone. Do not commit credentials.
+## How to continue
 
-## Completion and handoff update discipline
+```sh
+npm ci --ignore-scripts
+npm run check && npm run check:types && npm run lint
+npm run test:database && npm run test:database:wasm && npm run test:server
+npm run build && npm run test:web
+```
 
-Update this file on every meaningful implementation milestone with latest merged SHA, exact roadmap IDs and actual PRs, current test evidence, dependency versions, observed deployment state, migrations, backup/restore evidence, unresolved risks, blockers and next actionable task. Keep completed code, security review and live production readiness as distinct status fields. An agent with no earlier conversation history should be able to continue from this repository alone.
+Next dependency-ready units: **HEARD-14** (evidence integrity/provenance ledger; builds on objects + audit), **HEARD-15** (durable job framework; generalize the scan-job leasing), then HEARD-16…19 media processing, HEARD-20/21 case workflow and reviewer console. Keep new RLS policies on the reviewed allowlist in `db/tests/no-permissive-policies.sql`, keep publications default-deny until HEARD-23, and map every merged PR in `registry/prs.json` (`npm run check:registry`).
+
+## Discipline
+
+Never commit secrets or real personal data (fictional fixtures only). Keep implementation, testing, external review, certification and deployment as distinct statuses. Update this file and the registry at every merged milestone.

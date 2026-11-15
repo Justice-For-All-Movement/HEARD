@@ -42,13 +42,7 @@ Rights guides must identify their sources, relevant jurisdiction, and review dat
 
 HEARD is in early development. **There is no live HEARD service accepting private questions, testimony, or evidence.** Do not submit sensitive information through GitHub issues, pull requests, demonstration forms, or repository discussions.
 
-The repository currently contains the product specification, content system, foundational tests, and initial CI setup. A functioning application, secure intake, rights-review operation, and production deployment remain to be implemented and verified.
-
-To run the existing foundation checks with Node.js 22 or later:
-
-```sh
-npm run check
-```
+Work units HEARD-01 through HEARD-13 are merged: the public site shell, deployable Node web service with health/readiness, PostgreSQL schema with default-deny row-level security, anonymous identity and recovery, resource authorization, versioned consent, an accessible intake wizard with encrypted drafts and receipts, resumable private uploads and malware quarantine. Private intake is **disabled by default** and has not been deployed or independently reviewed. See [the handoff](docs/CROSS_ACCOUNT_HANDOFF.md) for exact PRs, tests, blockers and next steps, and [registry/prs.json](registry/prs.json) for the machine-readable plan.
 
 Development progress and live readiness are tracked separately. A completed roadmap entry is not evidence that the corresponding service is deployed or safe for sensitive use.
 
