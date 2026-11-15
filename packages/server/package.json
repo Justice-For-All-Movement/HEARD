@@ -21,6 +21,8 @@
     "@heard/identity": "0.0.1",
     "@heard/intake": "0.0.1",
     "@heard/operations": "0.0.1",
-    "@heard/secure-intake": "0.0.1"
+    "@heard/secure-intake": "0.0.1",
+    "@heard/storage": "0.0.1",
+    "@heard/uploads": "0.0.1"
   }
 }

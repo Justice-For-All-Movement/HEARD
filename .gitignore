@@ -11,6 +11,8 @@ coverage/
 *.key
 private/
 uploads/
+# Source package for HEARD-12 (the rule above is for local upload data only).
+!packages/uploads/
 
 
 *.tsbuildinfo

@@ -13,7 +13,7 @@ export const INTAKE_ENV = { HEARD_ENV: 'ci', DATABASE_URL: 'postgres://fixture@l
  * Migrated native PostgreSQL database plus an application pool that connects as a
  * NON-superuser login role (like a managed-provider owner), so RLS is really enforced.
  */
-export async function startHarness(name, env = {}) {
+export async function startHarness(name, env = {}, options = {}) {
   const server = await startPostgres();
   const admin = await server.database(name);
   await migrate(admin, migrationsDirectory);
@@ -23,7 +23,7 @@ export async function startHarness(name, env = {}) {
   await admin.query('GRANT USAGE ON SCHEMA public TO heard_test_app; GRANT SELECT ON heard_schema_migrations, heard_deployment_identity TO heard_test_app');
   const pool = new pg.Pool({ ...server.connection(name, 'heard_test_app'), max: 6 });
   const config = loadConfig({ ...INTAKE_ENV, ...env });
-  const app = createHeardServer({ config, pool, logger: silent });
+  const app = createHeardServer({ config, pool, logger: silent, ...options });
   return {
     admin, pool, config, app,
     async stop() { await pool.end(); await admin.end(); await server.stop(); },

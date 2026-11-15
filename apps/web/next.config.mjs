@@ -30,6 +30,8 @@ const config = {
     '@heard/authorization',
     '@heard/consent',
     '@heard/drafts',
+    '@heard/storage',
+    '@heard/uploads',
   ],
   experimental: { cpus: 2 },
   async headers() {

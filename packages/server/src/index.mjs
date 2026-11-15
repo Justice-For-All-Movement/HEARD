@@ -11,6 +11,8 @@ import { HttpError, errorResponse, json } from './http.mjs';
 import { identityModule } from './identity-routes.mjs';
 import { consentModule } from './consent-routes.mjs';
 import { draftsModule } from './drafts-routes.mjs';
+import { uploadsModule } from './upload-routes.mjs';
+import { selectStorage } from '@heard/storage';
 
 export { HttpError, errorResponse, json } from './http.mjs';
 
@@ -111,5 +113,7 @@ export function createHeardServer(options = {}) {
   app.use(identityModule(app.context));
   app.use(consentModule(app.context));
   app.use(draftsModule(app.context));
+  app.context.storage = options.storage !== undefined ? options.storage : selectStorage(app.config.objectStorage);
+  app.use(uploadsModule(app.context));
   return app;
 }
