@@ -53,6 +53,11 @@ export async function startPostgres() {
         await admin.query(`CREATE DATABASE ${name}`);
         const client = new pg.Client({ ...config, database: name }); await client.connect(); return client;
       },
+      /** Connection settings for pg.Pool against a fixture database, optionally as another login role. */
+      connection(name, user = config.user) {
+        if (!/^heard_test_[a-z]+$/.test(name)) throw new Error('Unsafe fixture database name');
+        return { ...config, database: name, user };
+      },
       async connect(name) {
         if (!/^heard_test_[a-z]+$/.test(name)) throw new Error('Unsafe fixture database name');
         const client=new pg.Client({...config,database:name});await client.connect();return client;

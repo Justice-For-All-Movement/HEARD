@@ -44,9 +44,10 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     if (readFileSync('apps/web/.next/BUILD_ID', 'utf8').trim() !== sha) throw new Error('Build identifier does not match source commit');
     mkdirSync('dist', { recursive: true });
     const archive = `heard-web-${sha}.tar`;
-    run('tar', ['--sort=name', '--mtime=@0', '--owner=0', '--group=0', '--numeric-owner', '-cf', `dist/${archive}`, '-C', 'apps/web/out', '.']);
-    const sourceFiles = ['package.json', 'package-lock.json', 'tsconfig.base.json', 'content/site-copy.json', ...files('apps/web/app'), ...files('apps/web/lib'), 'apps/web/package.json', 'apps/web/next.config.mjs', 'apps/web/tsconfig.json'];
-    const manifest = { schemaVersion: 1, sourceCommit: sha, sourceBinding, archive, archiveSha256: digest(readFileSync(`dist/${archive}`)), sourceFiles: Object.fromEntries(sourceFiles.sort().map(path => [path, digest(readFileSync(path))])), exportedFiles: Object.fromEntries(files('apps/web/out').map(path => [path.slice('apps/web/out/'.length), digest(readFileSync(path))])) };
+    // Server build output (Next.js production server), excluding the non-deterministic local cache.
+    run('tar', ['--sort=name', '--mtime=@0', '--owner=0', '--group=0', '--numeric-owner', '--exclude=./cache', '-cf', `dist/${archive}`, '-C', 'apps/web/.next', '.']);
+    const sourceFiles = ['package.json', 'package-lock.json', 'tsconfig.base.json', 'content/site-copy.json', 'scripts/start.mjs', ...files('apps/web/app'), ...files('apps/web/lib'), ...files('packages').filter(path => !path.includes('/node_modules/')), ...files('db/migrations'), 'apps/web/package.json', 'apps/web/next.config.mjs', 'apps/web/tsconfig.json'];
+    const manifest = { schemaVersion: 1, sourceCommit: sha, sourceBinding, archive, archiveSha256: digest(readFileSync(`dist/${archive}`)), sourceFiles: Object.fromEntries(sourceFiles.sort().map(path => [path, digest(readFileSync(path))])), buildFiles: Object.fromEntries(files('apps/web/.next').filter(path => !path.startsWith('apps/web/.next/cache/')).map(path => [path.slice('apps/web/.next/'.length), digest(readFileSync(path))])) };
     const path = `dist/heard-web-${sha}.json`;
     writeFileSync(path, JSON.stringify(manifest, null, 2) + '\n');
     verifyArchive(path);

@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { resolve } from 'node:path';
 import { migrate } from '../../packages/database/src/migrate.mjs';
+import { LATEST_MIGRATION } from '../../packages/database/src/runtime.mjs';
 import { startPostgres } from './postgres-fixture.mjs';
 
 test('native PostgreSQL serializes two real migration backends', async () => {
@@ -12,8 +13,8 @@ test('native PostgreSQL serializes two real migration backends', async () => {
     first = await server.database('heard_test_concurrency');
     second = await server.connect('heard_test_concurrency');
     const results = await Promise.all([migrate(first, resolve('db/migrations')), migrate(second, resolve('db/migrations'))]);
-    assert.deepEqual(results.flat().sort(), [1, 2, 3]);
-    assert.equal((await first.query('SELECT count(*)::int AS count FROM heard_migration_checksums')).rows[0].count, 3);
+    assert.deepEqual(results.flat().sort((a, b) => a - b), Array.from({ length: LATEST_MIGRATION }, (_, i) => i + 1));
+    assert.equal((await first.query('SELECT count(*)::int AS count FROM heard_migration_checksums')).rows[0].count, LATEST_MIGRATION);
     assert.deepEqual(await migrate(second, resolve('db/migrations')), []);
   } finally { if (first) await first.end(); if (second) await second.end(); await server.stop(); }
 });
