@@ -8,6 +8,7 @@ import { createPool, probeDatabase } from '@heard/database';
 import { assessReadiness, createLogger, errorCode, liveness, operatorAuthorized, publicReadiness } from '@heard/operations';
 import { adapterReadinessCheck, selectAdapter } from '@heard/secure-intake';
 import { HttpError, errorResponse, json } from './http.mjs';
+import { identityModule } from './identity-routes.mjs';
 
 export { HttpError, errorResponse, json } from './http.mjs';
 
@@ -105,5 +106,6 @@ export function createHeardServer(options = {}) {
   app.context.adapter = adapter;
   // The workflow engine is required for readiness only when private intake is enabled.
   app.use({ routes: [], readinessChecks: () => [adapterReadinessCheck(adapter, { required: app.config.intake.enabled })] });
+  app.use(identityModule(app.context));
   return app;
 }

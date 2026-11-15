@@ -5,7 +5,7 @@ export declare class HttpError extends Error { readonly code: string; readonly r
 export declare function json(status: number, body: unknown, headers?: Record<string, string>): Response;
 export declare function errorResponse(code: string, options?: { retryAfter?: number; fields?: Record<string, string> }): Response;
 export interface Route { method: string; pattern: RegExp; label?: string; handler: (request: Request, match: RegExpMatchArray, context: AppContext) => Promise<Response> | Response; }
-export interface AppContext { config: HeardConfig; logger: Logger; getPool: () => unknown; modules: AppModule[]; adapter?: import('@heard/secure-intake').SecureIntakeAdapter; }
+export interface AppContext { config: HeardConfig; logger: Logger; getPool: () => unknown; modules: AppModule[]; adapter?: import('@heard/secure-intake').SecureIntakeAdapter; requireSession?: (request: Request) => Promise<import('@heard/identity').Session>; }
 export interface AppModule { routes: Route[]; readinessChecks?: () => ReadinessCheck[]; }
 export interface HeardApp { config: HeardConfig; context: AppContext; use(module: AppModule): void; handle(request: Request): Promise<Response>; close(): Promise<void>; }
 export declare function createApp(options?: { config?: HeardConfig; env?: Record<string, string | undefined>; pool?: unknown; logger?: Logger; extraChecks?: ReadinessCheck[] }): HeardApp;

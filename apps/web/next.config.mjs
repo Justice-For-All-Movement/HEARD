@@ -26,6 +26,7 @@ const config = {
     '@heard/config',
     '@heard/operations',
     '@heard/secure-intake',
+    '@heard/identity',
   ],
   experimental: { cpus: 2 },
   async headers() {

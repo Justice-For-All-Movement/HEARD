@@ -1,21 +1,43 @@
--- Run in a disposable PostgreSQL 17 database after migrations 0001 and 0002.
--- Assert private tables remain default-deny until scoped service policies are reviewed.
+-- Run in a disposable PostgreSQL database after all migrations.
+-- Every RLS policy on a HEARD table must be (1) on the reviewed allowlist below,
+-- (2) granted only to scoped NOLOGIN roles, never PUBLIC, and (3) bound to the
+-- authenticated subject or a presented lookup secret (heard_current_subject /
+-- heard_setting). Unconditional (`true`) policies are rejected. Tables with no
+-- policy remain default-deny under FORCE ROW LEVEL SECURITY.
 DO $$
-DECLARE relation_name text;
-DECLARE policy_count integer;
+DECLARE p record;
+DECLARE reviewed text[] := ARRAY[
+  'heard_subjects.heard_subjects_self',
+  'heard_subjects.heard_subjects_operator',
+  'heard_profiles.heard_profiles_self',
+  'heard_sessions.heard_sessions_read',
+  'heard_sessions.heard_sessions_create',
+  'heard_sessions.heard_sessions_update',
+  'heard_recovery_credentials.heard_recovery_read',
+  'heard_recovery_credentials.heard_recovery_create',
+  'heard_recovery_credentials.heard_recovery_update',
+  'heard_staff_memberships.heard_staff_self',
+  'heard_staff_memberships.heard_staff_operator',
+  'heard_audit_events.heard_audit_append_self'
+];
+DECLARE scoped name[] := ARRAY['heard_api','heard_job_worker','heard_public_projector','heard_operator']::name[];
 BEGIN
- FOREACH relation_name IN ARRAY ARRAY[
-   'heard_subjects','heard_cases','heard_case_events',
-   'heard_consent_records','heard_private_objects','heard_publications','heard_resource_grants','heard_audit_events','heard_jobs'
- ] LOOP
-   SELECT count(*) INTO policy_count
-   FROM pg_policy p
-   JOIN pg_class c ON c.oid=p.polrelid
-   JOIN pg_namespace n ON n.oid=c.relnamespace
-   WHERE n.nspname=current_schema() AND c.relname=relation_name;
-   IF policy_count <> 0 THEN
-     RAISE EXCEPTION 'Unexpected RLS policy on sensitive table %', relation_name;
+ FOR p IN SELECT tablename, policyname, roles, qual, with_check, permissive FROM pg_policies WHERE schemaname = current_schema() AND tablename LIKE 'heard\_%' LOOP
+   IF NOT (p.tablename || '.' || p.policyname) = ANY(reviewed) THEN
+     RAISE EXCEPTION 'Unreviewed RLS policy %.%', p.tablename, p.policyname;
+   END IF;
+   IF 'public' = ANY(p.roles) OR NOT (p.roles <@ scoped) THEN
+     RAISE EXCEPTION 'Policy %.% must target scoped roles only', p.tablename, p.policyname;
+   END IF;
+   IF coalesce(p.qual, '') ~* '^\s*\(?\s*true\s*\)?\s*$' OR coalesce(p.with_check, '') ~* '^\s*\(?\s*true\s*\)?\s*$' THEN
+     RAISE EXCEPTION 'Unconditional policy %.%', p.tablename, p.policyname;
+   END IF;
+   IF coalesce(p.qual, '') !~ '(heard_current_subject|heard_setting)' AND coalesce(p.with_check, '') !~ '(heard_current_subject|heard_setting)' THEN
+     RAISE EXCEPTION 'Policy %.% is not bound to a subject or presented secret', p.tablename, p.policyname;
    END IF;
  END LOOP;
+ -- Tables that must stay default-deny (no policy at all) until their owning unit reviews access.
+ IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname = current_schema() AND tablename IN ('heard_jobs','heard_publications')) THEN
+   RAISE EXCEPTION 'Jobs and publications must remain default-deny';
+ END IF;
 END $$;
-
