@@ -1,0 +1,48 @@
+name: Render deployability (production-mode build, PostgreSQL 16, non-superuser owner)
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  render-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: ci-only-password
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # Exactly the Render build command.
+      - run: npm ci --ignore-scripts --include=dev && npm run build
+      - name: Create a Neon-like database owned by a non-superuser CREATEROLE login
+        env:
+          PGPASSWORD: ci-only-password
+        run: |
+          psql -h localhost -U postgres -v ON_ERROR_STOP=1 -c "CREATE ROLE neon_owner LOGIN PASSWORD 'ci-only-owner' CREATEROLE CREATEDB NOSUPERUSER" -c "CREATE DATABASE neonsim OWNER neon_owner"
+          psql -h localhost -U postgres -d neonsim -v ON_ERROR_STOP=1 -c "ALTER SCHEMA public OWNER TO pg_database_owner"
+      - name: Public shell without a database (start exactly as Render does)
+        run: node scripts/deploy-smoke.mjs
+        env:
+          HEARD_ENV: production
+      - name: With database, migrate on start, intake disabled (current live configuration)
+        run: node scripts/deploy-smoke.mjs
+        env:
+          HEARD_ENV: production
+          HEARD_MIGRATE_ON_START: 'true'
+          SMOKE_DB_USER: neon_owner
+          SMOKE_DB_PASSWORD: ci-only-owner
+          SMOKE_DB_NAME: neonsim

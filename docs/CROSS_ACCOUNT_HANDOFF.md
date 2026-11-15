@@ -13,14 +13,14 @@ HEARD brings rights information, practical support, and firsthand experiences to
 
 ## Status (separate fields — do not conflate)
 
-A production deployment, live private intake, verified secure messaging, a domain and Engine Room monitoring have **not been established**.
+Live private intake, production readiness for sensitive use, verified secure messaging, a custom domain and Engine Room monitoring have **not been established**.
 
 | Field | State |
 |---|---|
 | Source implementation | HEARD-01 … HEARD-14 merged (see table). HEARD-15 onward not started. |
 | Automated tests | `npm run check` (unit, contracts, registry), `test:database` (native PostgreSQL 17.11) and `test:database:wasm`, `test:server` (API against native PostgreSQL with a non-superuser login), `test:web` (production Next.js server). All pass on `main` in GitHub Actions (`foundation`, `database`). |
 | Security review | AI-assisted review and adversarial tests per owner policy (AGENTS.md). Independent human review / penetration test: **pending, deferred** (not a blocker). No certification claimed. |
-| Deployment | **Not deployed.** `render.yaml` and [DEPLOYMENT_RENDER.md](DEPLOYMENT_RENDER.md) are ready for the lead; no Render, Neon or B2 resource was created by the implementing agent. |
+| Deployment | Render service `heard-web` at https://heard-web-ug5f.onrender.com (free plan, auto-deploy from `main`, Neon PostgreSQL 16), set up by the lead; intake disabled. See [DEPLOYMENT_RENDER.md](DEPLOYMENT_RENDER.md). |
 | Sensitive intake | **Disabled by default** (`HEARD_INTAKE_ENABLED=false`). Do not enable for real contributors before the §16 release gates. |
 
 ## Merged work units

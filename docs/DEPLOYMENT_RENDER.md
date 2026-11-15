@@ -1,6 +1,18 @@
 # Deploying HEARD on Render (HEARD-06)
 
-Status: deployable engineering service. This document describes how the lead deploys it; **no Render, Neon or B2 resource has been created by the implementing agent**, and a deployed URL is not evidence that private intake is safe to open. Intake stays disabled (`HEARD_INTAKE_ENABLED=false`) until the release gates in `docs/DEVELOPMENT_PLAN.md` §16 are met.
+Status: deployable engineering service. A deployed URL is not evidence that private intake is safe to open. Intake stays disabled (`HEARD_INTAKE_ENABLED=false`) until the release gates in `docs/DEVELOPMENT_PLAN.md` §16 are met.
+
+## Live deployment (recorded 2026-11-15)
+
+| Item | Value |
+|---|---|
+| URL | https://heard-web-ug5f.onrender.com |
+| Render service | `heard-web` (free plan, native Node, auto-deploy from `main`) |
+| Database | dedicated Neon PostgreSQL 16 database (`DATABASE_URL`, migrations on start) |
+| Configured secrets | session secret, data encryption key, operations token (values held in Render only) |
+| Intake | `HEARD_INTAKE_ENABLED=false` |
+
+Created and configured by the deploying lead, not by the implementing agent. Because the service auto-deploys from `main`, every PR must keep `main` deployable: the `Render deployability` workflow runs the exact Render build command with `NODE_ENV=production`, then starts the service with `npm start` with no database and with PostgreSQL 16 owned by a non-superuser CREATEROLE login (as on Neon), and requires `/api/health` and `/api/ready` to pass. The first deploy (`cd4208b`) failed at build because `NODE_ENV=production` made `npm ci` omit devDependencies; the build command now includes `--include=dev` (and `.npmrc` sets `include=dev`).
 
 ## What runs
 
@@ -8,7 +20,7 @@ One Render **Node web service** (`render.yaml`, service `heard-web`) running the
 
 | Step | Command |
 |---|---|
-| Build | `npm ci --ignore-scripts && npm run build` |
+| Build | `npm ci --ignore-scripts --include=dev && npm run build` (Render sets `NODE_ENV=production`, which would otherwise omit the TypeScript toolchain `next build` needs; `.npmrc` also sets `include=dev`) |
 | Start | `npm start` (runs `scripts/start.mjs`) |
 | Health check (liveness) | `GET /api/health` → `200 {"status":"alive","release":…}` |
 | Readiness | `GET /api/ready` → `200 {"status":"ready"}` or `503 {"status":"not_ready"}` |
