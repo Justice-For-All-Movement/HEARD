@@ -1,0 +1,47 @@
+# HEARD Render Blueprint (HEARD-06). Describes the web service only; it does not
+# create a database, bucket or any paid resource. The PostgreSQL database is an
+# isolated Neon project supplied through DATABASE_URL. See docs/DEPLOYMENT_RENDER.md.
+#
+# Secrets are `sync: false`: Render asks for their values when the Blueprint is
+# applied and never reads them from this file. Leave optional ones blank to start
+# with the public shell only (no database, intake disabled).
+services:
+  - type: web
+    name: heard-web
+    runtime: node
+    plan: free # Choose the plan deliberately; cost decisions belong to the deploying lead.
+    buildCommand: npm ci --ignore-scripts && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: false
+    envVars:
+      - key: NODE_VERSION
+        value: 22.23.4
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_TELEMETRY_DISABLED
+        value: "1"
+      - key: HEARD_ENV
+        value: production
+      - key: HEARD_LOG_LEVEL
+        value: info
+      - key: HEARD_INTAKE_ENABLED
+        value: "false"
+      - key: HEARD_MIGRATE_ON_START
+        value: "true"
+      - key: HEARD_SECURE_INTAKE_MODE
+        value: local
+      - key: HEARD_OBJECT_STORAGE_DRIVER
+        value: none
+      - key: HEARD_SCANNER_DRIVER
+        value: none
+      - key: HEARD_PUBLIC_ORIGIN
+        value: https://heard-web.onrender.com # Replace with the real custom domain before enabling intake.
+      - key: DATABASE_URL
+        sync: false
+      - key: HEARD_OPERATIONS_TOKEN
+        sync: false
+      - key: HEARD_SESSION_SECRET
+        sync: false
+      - key: HEARD_DATA_ENCRYPTION_KEY
+        sync: false

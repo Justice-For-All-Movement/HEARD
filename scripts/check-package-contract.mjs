@@ -20,7 +20,7 @@ export function verifyPackages(root=process.cwd()) {
     for (const section of ['dependencies','devDependencies']) {
       if (JSON.stringify(child[section]??{})!==JSON.stringify(lock.packages[path][section]??{})) throw new Error(`Package manifest/lock mismatch: ${path}`);
       for (const [name,version] of Object.entries(child[section]??{})) {
-        if (version.startsWith('file:') || name.startsWith('@heard/')) { if (lock.packages?.[`node_modules/${name}`]?.link!==true) throw new Error(`Unlinked workspace dependency: ${name}`); continue; }
+        if (name.startsWith('@heard/')) { if (lock.packages?.[`node_modules/${name}`]?.link!==true || read(`${lock.packages[`node_modules/${name}`].resolved}/package.json`).version!==version) throw new Error(`Unlinked workspace dependency: ${name}`); continue; }
         const resolved=lock.packages?.[`${path}/node_modules/${name}`]??lock.packages?.[`node_modules/${name}`];
         if (!EXACT.test(version) || resolved?.version!==version) throw new Error(`Unpinned package dependency: ${name}`);
       }
@@ -35,6 +35,7 @@ export function verifyPackages(root=process.cwd()) {
       for (const section of ['dependencies','devDependencies']) {
         if (JSON.stringify(app[section]??{})!==JSON.stringify(locked[section]??{})) throw new Error(`App manifest/lock mismatch: ${path}`);
         for (const [name,version] of Object.entries(app[section]??{})) {
+          if (name.startsWith('@heard/')) { if (lock.packages?.[`node_modules/${name}`]?.link!==true || read(`${lock.packages[`node_modules/${name}`].resolved}/package.json`).version!==version) throw new Error(`Unlinked workspace dependency: ${name}`); continue; }
           const resolved=lock.packages?.[`${path}/node_modules/${name}`]??lock.packages?.[`node_modules/${name}`];
           if (!EXACT.test(version) || resolved?.version!==version) throw new Error(`Unpinned app dependency: ${name}`);
         }

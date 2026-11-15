@@ -4,6 +4,8 @@ import { readFile, mkdtemp, cp, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { migrate } from '../../packages/database/src/migrate.mjs';
+import { LATEST_MIGRATION } from '../../packages/database/src/runtime.mjs';
+const ALL = Array.from({ length: LATEST_MIGRATION }, (_, i) => i + 1);
 import { startPostgres } from './postgres-fixture.mjs';
 const directory = resolve('db/migrations');
 const sql = name => readFile(name, 'utf8');
@@ -18,7 +20,7 @@ test('migrations and security invariants on the explicitly selected PostgreSQL e
     assert.match(version,process.env.HEARD_DATABASE_ENGINE==='pglite' ? /PostgreSQL 1[78]\./ : /PostgreSQL 17\.11/);
     const client = await database('heard_test_blank');
     await t.test('blank migration, repeated runner and canonical SQL invariants', async () => {
-      assert.deepEqual(await migrate(client, directory), [1, 2, 3]);
+      assert.deepEqual(await migrate(client, directory), ALL);
       assert.deepEqual(await migrate(client, directory), []);
       await client.query(await sql('db/fixtures/synthetic.sql'));
       await client.query(await sql('db/fixtures/synthetic.sql'));
@@ -59,7 +61,7 @@ test('migrations and security invariants on the explicitly selected PostgreSQL e
       const prior = await database('heard_test_upgrade');
       assert.deepEqual(await migrate(prior, directory, { targetVersion: 2 }), [1,2]);
       await prior.query(await sql('db/fixtures/synthetic.sql'));
-      assert.deepEqual(await migrate(prior, directory), [3]);
+      assert.deepEqual(await migrate(prior, directory), ALL.slice(2));
       assert.equal((await prior.query('SELECT quarantine_state FROM heard_private_objects')).rows[0].quarantine_state, 'quarantined');
       assert.equal((await prior.query('SELECT state FROM heard_publications')).rows[0].state, 'withdrawn');
       await assert.rejects(migrate(prior,directory,{targetVersion:2}),/downgrade/);
@@ -76,10 +78,10 @@ test('migrations and security invariants on the explicitly selected PostgreSQL e
       const root = await mkdtemp(join(tmpdir(), 'heard-migration-failure-'));
       try {
         await cp(directory, root, { recursive: true });
-        await writeFile(join(root, '0004_failure.sql'), 'BEGIN; CREATE TABLE rollback_probe(id integer); SELECT 1/0; COMMIT;\n');
+        await writeFile(join(root, `${String(LATEST_MIGRATION + 1).padStart(4, '0')}_failure.sql`), 'BEGIN; CREATE TABLE rollback_probe(id integer); SELECT 1/0; COMMIT;\n');
         await assert.rejects(migrate(client, root), { code: '22012' });
         assert.equal((await client.query("SELECT to_regclass('rollback_probe') AS relation")).rows[0].relation, null);
-        assert.equal((await client.query('SELECT max(version) AS version FROM heard_schema_migrations')).rows[0].version, 3);
+        assert.equal((await client.query('SELECT max(version) AS version FROM heard_schema_migrations')).rows[0].version, LATEST_MIGRATION);
         const first = join(root, '0001_initial.sql');
         await writeFile(first, '-- Changed historical source\n' + await sql(first));
         await assert.rejects(migrate(client, root), /MIGRATION_HISTORY_MISMATCH/);

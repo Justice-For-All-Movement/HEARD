@@ -57,9 +57,17 @@ Development progress and live readiness are tracked separately. A completed road
 The canonical [security/e2eesa-status.json](security/e2eesa-status.json) records standard implementation, complete testing and independent expert review separately. Engine Room reads it automatically from GitHub. All initial stages are pending; existing profile locks and approved decisions remain authoritative. Read [adoption and independent-account instructions](docs/E2EESA_ADOPTION.md), and run `python3 scripts/validate_e2eesa_status.py`. Record validation does not establish product security or certification.
 
 
-## Engineering app shell
+## Engineering app and deployment
 
-The public-only Next.js shell lives in `apps/web`. See [workspace setup and verification limits](docs/WORKSPACE_PLAN.md) for `npm ci`, type checking, production export and local development commands. This engineering preview does not accept personal information or provide live case services.
+The Next.js web service lives in `apps/web`; framework-agnostic API modules live in `packages/*` (`config`, `operations`, `database`, `server`, …). See [workspace setup and verification limits](docs/WORKSPACE_PLAN.md) for local commands and [Render deployment](docs/DEPLOYMENT_RENDER.md) for build/start commands, health/readiness endpoints and every environment variable. The service runs without external credentials (public shell only); private intake is disabled by default and requires a database and keys. This engineering preview does not accept personal information or provide live case services.
+
+```sh
+npm ci --ignore-scripts
+npm run check            # foundation, registry, unit tests
+npm run test:database    # native PostgreSQL 17 migrations and RLS
+npm run test:server      # API modules against native PostgreSQL
+npm run build && npm run test:web && npm start
+```
 
 ## Requirements handoff
 
