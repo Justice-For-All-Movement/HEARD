@@ -1,11 +1,12 @@
 import {readFileSync, readdirSync, existsSync} from 'node:fs';
 import {join} from 'node:path';
 export function verifyPackages(root=process.cwd()) {
+  const EXACT=/^\d+\.\d+\.\d+(?:-[0-9A-Za-z]+(?:\.[0-9A-Za-z]+)*)?$/;
   const read=(name)=>JSON.parse(readFileSync(join(root,name),'utf8'));
   const pkg=read('package.json'),lock=read('package-lock.json');
   if (!Array.isArray(pkg.workspaces) || !pkg.workspaces.includes('packages/*') || lock.lockfileVersion < 3 || lock.packages?.['']?.name!==pkg.name) throw new Error('Workspace lock mismatch');
   for (const [name, version] of Object.entries({...pkg.dependencies, ...pkg.devDependencies})) {
-    if (!/^\d+\.\d+\.\d+$/.test(version) || lock.packages?.[`node_modules/${name}`]?.version!==version) throw new Error(`Unpinned dependency: ${name}`);
+    if (!EXACT.test(version) || lock.packages?.[`node_modules/${name}`]?.version!==version) throw new Error(`Unpinned dependency: ${name}`);
   }
   const dirs=readdirSync(join(root,'packages'),{withFileTypes:true}).filter(entry=>entry.isDirectory()).map(entry=>entry.name);
   if (!dirs.length) throw new Error('No workspace packages');
@@ -16,6 +17,14 @@ export function verifyPackages(root=process.cwd()) {
     const ts=read(`${path}/tsconfig.json`);
     if (ts.extends!=='../../tsconfig.base.json' || !existsSync(join(root,path,'src/index.d.mts')) || !existsSync(join(root,path,'src/index.mjs'))) throw new Error(`Missing types or runtime: ${path}`);
     if (lock.packages?.[path]?.name!==child.name || lock.packages?.[`node_modules/${child.name}`]?.link!==true) throw new Error(`Unpinned workspace: ${path}`);
+    for (const section of ['dependencies','devDependencies']) {
+      if (JSON.stringify(child[section]??{})!==JSON.stringify(lock.packages[path][section]??{})) throw new Error(`Package manifest/lock mismatch: ${path}`);
+      for (const [name,version] of Object.entries(child[section]??{})) {
+        if (version.startsWith('file:') || name.startsWith('@heard/')) { if (lock.packages?.[`node_modules/${name}`]?.link!==true) throw new Error(`Unlinked workspace dependency: ${name}`); continue; }
+        const resolved=lock.packages?.[`${path}/node_modules/${name}`]??lock.packages?.[`node_modules/${name}`];
+        if (!EXACT.test(version) || resolved?.version!==version) throw new Error(`Unpinned package dependency: ${name}`);
+      }
+    }
   }
   let apps=0;
   if (pkg.workspaces.includes('apps/*')) {
@@ -27,7 +36,7 @@ export function verifyPackages(root=process.cwd()) {
         if (JSON.stringify(app[section]??{})!==JSON.stringify(locked[section]??{})) throw new Error(`App manifest/lock mismatch: ${path}`);
         for (const [name,version] of Object.entries(app[section]??{})) {
           const resolved=lock.packages?.[`${path}/node_modules/${name}`]??lock.packages?.[`node_modules/${name}`];
-          if (!/^\d+\.\d+\.\d+$/.test(version) || resolved?.version!==version) throw new Error(`Unpinned app dependency: ${name}`);
+          if (!EXACT.test(version) || resolved?.version!==version) throw new Error(`Unpinned app dependency: ${name}`);
         }
       }
       apps++;
